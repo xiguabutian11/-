@@ -1,0 +1,28 @@
+{
+   "cutOffs": [
+      {
+         "begin": 73.986,
+         "end": 75.986
+      }
+   ],
+   "lossSegs": [
+      {
+         "begin": 53.986,
+         "end": 73.986,
+         "lossType": 0,
+         "segmentType": 1,
+         "fixedLength": 2,
+         "fixedNumber": 10,
+         "defaultDistriType": 0
+      },
+      {
+         "begin": 75.986,
+         "end": 95.986,
+         "lossType": 0,
+         "segmentType": 1,
+         "fixedLength": 2,
+         "fixedNumber": 0,
+         "defaultDistriType": 1
+      }
+   ]
+}

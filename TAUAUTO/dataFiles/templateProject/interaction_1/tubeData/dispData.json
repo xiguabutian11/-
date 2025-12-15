@@ -1,0 +1,30 @@
+{
+   "dispGroupPath" : [
+      {
+         "name" : "1",
+         "fileType" : "TXT",
+         "path" : "C:/Users/HYGK/Desktop/TAUAUTO/TAUAUTO/TAUAUTO/dataFiles/templateDispersionFiles/dispersionData_2/position_1",
+         "skipHeader" : 3
+      }
+   ],
+   "samplePoints" : [
+      {
+         "point": 0,
+         "dispKey": "1",
+         "endPoint": 0,
+         "interpoType": 0,
+         "pointInsertType": 0,
+         "fixedNumber": 4,
+         "fixedLength": 0
+      },
+      {
+         "point": 18,
+         "dispKey": "1",
+         "endPoint": 1,
+         "interpoType": 0,
+         "pointInsertType": 0,
+         "fixedNumber": 4,
+         "fixedLength": 0
+      }
+   ]
+}

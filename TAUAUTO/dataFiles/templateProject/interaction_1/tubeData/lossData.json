@@ -1,0 +1,156 @@
+{
+   "lossdata":
+    [
+      {
+        "type": 0,
+        "begin": 42,
+        "end": 44,
+        "loss": [500]
+      },
+      {
+        "type": 0,
+        "begin": 44,
+        "end": 46,
+        "loss": [1500]
+      },
+      {
+        "type": 0,
+        "begin": 46,
+        "end": 48,
+        "loss": [2000]
+      },
+      {
+        "type": 0,
+        "begin": 48,
+        "end": 50,
+        "loss": [1000]
+      },
+      {
+        "type": 0,
+        "begin": 50,
+        "end": 52,
+        "loss": [1500]
+      },
+      {
+        "type": 0,
+        "begin": 52,
+        "end": 54,
+        "loss": [2000]
+      },
+      {
+        "type": 0,
+        "begin": 54,
+        "end": 56,
+        "loss": [2500]
+      },
+      {
+        "type": 0,
+        "begin": 56,
+        "end": 58,
+        "loss": [1000]
+      },
+      {
+        "type": 0,
+        "begin": 58,
+        "end": 60,
+        "loss": [2500]
+      },
+      {
+        "type": 0,
+        "begin": 60,
+        "end": 62,
+        "loss": [2500]
+      },
+      {
+        "type": 0,
+        "begin": 62,
+        "end": 64,
+        "loss": [1500]
+      },
+      {
+        "type": 0,
+        "begin": 64,
+        "end": 66,
+        "loss": [2500]
+      },
+      {
+        "type": 0,
+        "begin": 68,
+        "end": 70,
+        "loss": [500]
+      },
+      {
+        "type": 0,
+        "begin": 70,
+        "end": 72,
+        "loss": [1500]
+      },
+      {
+        "type": 0,
+        "begin": 72,
+        "end": 74,
+        "loss": [2000]
+      },
+      {
+        "type": 0,
+        "begin": 74,
+        "end": 76,
+        "loss": [1000]
+      },
+      {
+        "type": 0,
+        "begin": 76,
+        "end": 78,
+        "loss": [1500]
+      },
+      {
+        "type": 0,
+        "begin": 78,
+        "end": 80,
+        "loss": [2000]
+      },
+      {
+        "type": 0,
+        "begin": 80,
+        "end": 82,
+        "loss": [2500]
+      },
+      {
+        "type": 0,
+        "begin": 82,
+        "end": 84,
+        "loss": [1000]
+      },
+      {
+        "type": 0,
+        "begin": 84,
+        "end": 86,
+        "loss": [2500]
+      },
+      {
+        "type": 0,
+        "begin": 86,
+        "end": 88,
+        "loss": [2500]
+      },
+      {
+        "type": 0,
+        "begin": 88,
+        "end": 90,
+        "loss": [1500]
+      },
+      {
+        "type": 0,
+        "begin": 90,
+        "end": 92,
+        "loss": [2500]
+      }
+    ],
+    "cutOff":
+    [
+      {
+        "begin": 66,
+        "end": 68
+      }
+    ]
+}

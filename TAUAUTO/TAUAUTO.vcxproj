@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="calculation\calculation.cpp" />
+    <ClCompile Include="cal_change\calsetting_change.cpp" />
+    <ClCompile Include="cal_change\DataGet.cpp" />
+    <ClCompile Include="cal_change\find_voltage.cpp" />
+    <ClCompile Include="commonFuncs\formula.cpp" />
+    <ClCompile Include="commonFuncs\funcs.cpp" />
+    <ClCompile Include="commonFuncs\funcsTwo.cpp" />
+    <ClCompile Include="ctlDataUpdate\ctlData.cpp" />
+    <ClCompile Include="dataFiles\ctlDataUpdate\ctlData.cpp" />
+    <ClCompile Include="disperDataProcess\dispDtProcess.cpp" />
+    <ClCompile Include="filesReadAndWrite\fileReading.cpp" />
+    <ClCompile Include="filesReadAndWrite\fileWriting.cpp" />
+    <ClCompile Include="filesReadAndWrite\readCheck.cpp" />
+    <ClCompile Include="lossDataProcess\lossDataProcess.cpp" />
+    <ClCompile Include="main.cpp">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">_HAS_STD_BYTE=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="NEW\gongshi.cpp" />
+    <ClCompile Include="NEW\tube_length.cpp" />
+    <ClCompile Include="SESAN1\SESAN\data_get\SeSan_get.cpp" />
+    <ClCompile Include="SESAN1\SESAN\exe\jisuan\Jisuan.cpp" />
+    <ClCompile Include="SESAN1\SESAN\jisuan\Jisuan.cpp" />
+    <ClCompile Include="SESAN1\SESAN\judgeANDchange\change_units.cpp" />
+    <ClCompile Include="SESAN1\SESAN\judgeANDchange\judge.cpp" />
+    <ClCompile Include="SESAN1\SESAN\SeSanJieGou.cpp" />
+    <ClCompile Include="SESAN1\SESAN\sesanjiegou\constpar.cpp" />
+    <ClCompile Include="SESAN1\SESAN\sesanjiegou\sesan.cpp" />
+    <ClCompile Include="SESAN1\SESAN\sesanjiegou\TauEigen.cpp" />
+    <ClCompile Include="SESAN1\SESAN\shuchu\shuchu.cpp" />
+    <ClCompile Include="SESAN1\SESAN\writeANDread\read.cpp" />
+    <ClCompile Include="SESAN1\SESAN\writeANDread\write.cpp" />
+    <ClCompile Include="SESAN1\SESAN\YOUHUA\tiaozheng.cpp" />
+    <ClCompile Include="SESAN1\SESAN\YOUHUA\youhua.cpp" />
+    <ClCompile Include="SESAN1\SESAN\YuChuLi\first_param.cpp" />
+    <ClCompile Include="TAU.cpp" />
+    <ClCompile Include="paramAndUnit\parameter.cpp" />
+    <ClCompile Include="paramScan\paramScan.cpp" />
+    <ClCompile Include="projManage\projManage.cpp" />
+    <ClCompile Include="resultProcess\resultPro.cpp" />
+    <ClCompile Include="tauLib\headers\TauEigen.cpp" />
+    <ClCompile Include="tauLib\sources\constrpar.cpp" />
+    <ClCompile Include="tauLib\sources\TauInteraction.cpp" />
+    <ClCompile Include="thirdPtyLibs\json\jsoncpp.cpp" />
+    <ClCompile Include="usrDataInfo\usrData.cpp" />
+    <ClCompile Include="usrDataInfo\usrDataCheck.cpp" />
+    <ClCompile Include="usrDataInfo\usrDataSet.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="calculation\calculation.h" />
+    <ClInclude Include="cal_change\calsetting_change.h" />
+    <ClInclude Include="cal_change\DataGet.h" />
+    <ClInclude Include="cal_change\find_voltage.h" />
+    <ClInclude Include="commonFuncs\formula.h" />
+    <ClInclude Include="commonFuncs\funcs.h" />
+    <ClInclude Include="commonFuncs\funcsTwo.h" />
+    <ClInclude Include="constData\constDataInfo.h" />
+    <ClInclude Include="constData\constInfo.h" />
+    <ClInclude Include="constData\structDefine.h" />
+    <ClInclude Include="ctlDataUpdate\ctlData.h" />
+    <ClInclude Include="dataFiles\ctlDataUpdate\ctlData.h" />
+    <ClInclude Include="disperDataProcess\dispDtProcess.h" />
+    <ClInclude Include="filesReadAndWrite\fileReading.h" />
+    <ClInclude Include="filesReadAndWrite\fileWriting.h" />
+    <ClInclude Include="filesReadAndWrite\readCheck.h" />
+    <ClInclude Include="lossDataProcess\lossDataProcess.h" />
+    <ClInclude Include="NEW\gongshi.h" />
+    <ClInclude Include="NEW\tube_length.h" />
+    <ClInclude Include="paramAndUnit\parameter.h" />
+    <ClInclude Include="paramScan\paramScan.h" />
+    <ClInclude Include="projManage\projManage.h" />
+    <ClInclude Include="resultProcess\resultPro.h" />
+    <ClInclude Include="SESAN1\DATA\data_start.h" />
+    <ClInclude Include="SESAN1\SESAN\data_get\SeSan_get.h" />
+    <ClInclude Include="SESAN1\SESAN\exe\jisuan\Jisuan.h" />
+    <ClInclude Include="SESAN1\SESAN\jisuan\Jisuan.h" />
+    <ClInclude Include="SESAN1\SESAN\judgeANDchange\change_units.h" />
+    <ClInclude Include="SESAN1\SESAN\judgeANDchange\judge.h" />
+    <ClInclude Include="SESAN1\SESAN\parameter\parameter.h" />
+    <ClInclude Include="SESAN1\SESAN\SeSanJieGou.h" />
+    <ClInclude Include="SESAN1\SESAN\sesanjiegou\constpar.h" />
+    <ClInclude Include="SESAN1\SESAN\sesanjiegou\params.h" />
+    <ClInclude Include="SESAN1\SESAN\sesanjiegou\sesan.h" />
+    <ClInclude Include="SESAN1\SESAN\sesanjiegou\TauEigen.h" />
+    <ClInclude Include="SESAN1\SESAN\shuchu\shuchu.h" />
+    <ClInclude Include="SESAN1\SESAN\writeANDread\read.h" />
+    <ClInclude Include="SESAN1\SESAN\writeANDread\write.h" />
+    <ClInclude Include="SESAN1\SESAN\YOUHUA\youhua.h" />
+    <ClInclude Include="SESAN1\SESAN\YuChuLi\first_param.h" />
+    <ClInclude Include="TAU.h" />
+    <ClInclude Include="tauLib\headers\constpar.h" />
+    <ClInclude Include="tauLib\headers\params.h" />
+    <ClInclude Include="tauLib\headers\TauEigen.h" />
+    <ClInclude Include="tauLib\headers\TauInteraction.h" />
+    <ClInclude Include="thirdPtyLibs\BSThreadPool\BS_thread_pool.hpp" />
+    <ClInclude Include="thirdPtyLibs\ExprTk\exprtk.hpp" />
+    <ClInclude Include="thirdPtyLibs\json\json-forwards.h" />
+    <ClInclude Include="thirdPtyLibs\json\json.h" />
+    <ClInclude Include="thirdPtyLibs\rapidcsv\rapidcsv.h" />
+    <ClInclude Include="usrDataInfo\usrData.h" />
+    <ClInclude Include="usrDataInfo\usrDataCheck.h" />
+    <ClInclude Include="usrDataInfo\usrDataSet.h" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>17.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{14e4cc03-86ff-413c-8df3-becc407fc1ef}</ProjectGuid>
+    <RootNamespace>TAUAUTO</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>C:\Users\liu\Desktop\TAUAUTO\TAUAUTO\SESAN1\SESAN;C:\Users\liu\Desktop\TAUAUTO\TAUAUTO\SESAN1;C:\Users\liu\Desktop\TAUAUTO\TAUAUTO;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\liu\Desktop\boost1\stage\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;NOMINMAX;_HAS_STD_BYTE=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>C:\Users\liu\Desktop\boost1;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>C:\Users\liu\Desktop\boost1\stage\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

@@ -1,0 +1,58 @@
+' twt  ',
+'CONTROL PARAMETERS',
+'nom number of variant-------------------------------------',1
+'kv number of changes FREQUENCY OF A SIGNAL no more than6 ',2
+'IUST Sites of stability____________________________________',0
+'IGAR AMOUNT of HARMONICSES-----------------------------------',3
+'Ikanal---------------- ------------------------------------',0
+'Ipe Tag of the full output------------------------------ ',0
+'Igun- DATA INPUT FROM THE GUN ---------------------------------',0
+'IKOL- DATA OUTPUT FOR THE COLLECTOR--------------------',0
+'M-  number of electrons no more than 192--------------------------',96
+'IbN number of changes of SWS-------',3
+'IdN number of changes of  loss  -const  no more than 50-----------',12
+'IDR=(n-number of drifts, 0 - no drifts)-----------------------',1
+'IMP number of changes of magnetic inductance no more than 50-----',1
+' Point WRITE' ,0.6
+' The array  of  wale length  ' Input signal   Pinp ------------',
+3.000000   0.150000   0.000000   0.000000
+4.000000   0.150000   0.000000   0.000000
+'ZZZ is coordinate of the beam entrance tj the collectjr',0.6
+'xooh Coordinate of the input of the HF power----------------',0
+'kanal-----------------------------------------------------',
+'Zo coordinate of the nearest to entrance of SWS zero from cathode side',0.0
+'IO - beam current-------------------------------------',0.4
+'UO-accelerating voltage-----------------------', 6600
+'NC- amount of layers---------------------------', 3
+'R1 -an upper radius of a boundary of the 1 layer-----------',
+0.000981495457622364
+0.00138804418757713
+0.0017
+'An averaged radial velocity',
+1000000, 1000000, 1000000, 
+'A   radius of the tunnel----------------- ',0.0034
+'ZB(I) beginning of the regions with DECELERATION-const, I =IBN',
+0
+0.0279
+0.02883
+ 'ZDR(I) beginning of the regions with FIELD=0, I =IDR',
+0.0279 0.02883
+'IMP number of changes of constant of a magnetic inductance50',
+1     0     0.0085     0     0.3     0
+'LN1(I)  SPECIFIC  DAMPING 1 HARMONIC  I=1+IDN---',
+0     0.02232     0.02332     1142.85714285714     1142.85714285714
+0     0.02332     0.02432     2285.71428571429     2285.71428571429
+0     0.02432     0.02532     3428.57142857143     3428.57142857143
+0     0.02532     0.02632     4571.42857142857     4571.42857142857
+0     0.02632     0.02732     5714.28571428571     5714.28571428571
+0     0.02732     0.0279     11822.6600985222     11822.6600985222
+0     0.02883     0.02983     6857.14285714286     6857.14285714286
+0     0.02983     0.03083     5714.28571428571     5714.28571428571
+0     0.03083     0.03183     4571.42857142857     4571.42857142857
+0     0.03183     0.03283     3428.57142857143     3428.57142857143
+0     0.03283     0.03383     2285.71428571429     2285.71428571429
+0     0.03383     0.03441     1970.4433497537     1970.4433497537
+'H(length of the step of the calculation)-------------------',0.0005
+'Xend(length of the tube)=----------------------------------',0.6
+' Sites of stability***********************',
+'*********************************************end'

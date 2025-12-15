@@ -1,0 +1,37 @@
+[name]
+interaction_1
+
+[creationTime]
+2024-06-27 11:05:58
+
+[lastSaveTime]
+2024-06-27 11:05:58
+
+[tubeData]
+/tubeData/tubeData.json
+
+[magData]
+/tubeData/magData.json
+
+[beamData]
+/tubeData/beamData.json
+
+[freqData]
+/tubeData/freqData.json
+
+[lossData]
+/tubeData/lossData.json
+
+[dispData]
+/tubeData/dispData.json
+
+[calSetting]
+/calSetting.json
+
+[message]
+/message.txt
+
+[paramLink]
+/paramLink.json
+
+[resFiles]

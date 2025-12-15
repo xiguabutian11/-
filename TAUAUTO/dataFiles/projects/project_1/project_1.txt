@@ -1,0 +1,17 @@
+[project name]
+project_1
+
+[creation time]
+2024-06-26 16:59:39
+
+[last save time]
+2024-06-26 17:59:39
+
+[calculation groups]
+interaction_1
+
+[parameter file path]
+paramsAndUnits/parameter.csv
+
+[unit file path]
+paramsAndUnits/unit.json

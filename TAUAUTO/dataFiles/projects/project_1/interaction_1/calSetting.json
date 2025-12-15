@@ -1,0 +1,26 @@
+{
+   "calSetting" : [
+      {
+         "name" : "sequence1",
+         "par" :
+         [
+            {
+               "sign": "frequency",
+               "stateSign": 0,
+               "array": [17.7,18.4,19.1,19.5,19.8,20.5,20.9,21.2]
+            },
+            {
+               "sign": "pin",
+               "stateSign": 1,
+               "array": [0.1,0.17,0.2,0.28,0.35,0.4,0.7]
+            },
+            {
+               "sign": "v1",
+               "stateSign": 0,
+               "array": [16000,16600]
+            }
+         ]
+      }
+   ]
+}
+

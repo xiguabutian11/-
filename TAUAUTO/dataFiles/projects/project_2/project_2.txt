@@ -1,0 +1,17 @@
+[peoject name]
+project_2
+
+[creation time]
+2024-06-27 11:05:58
+
+[last save time]
+2024-06-27 11:05:58
+
+[calculation groups]
+/interaction_1
+
+[parameter file path]
+/paramsAndUnits/parameter.csv
+
+[unit file path]
+/paramsAndUnits/unit.json

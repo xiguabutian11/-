@@ -1,0 +1,13 @@
+{
+   "dispDataIndex" : [ 1, 1, 1, 1, 1, 1, 1 ],
+   "dispGroupPath" : [
+      {
+         "SN" : 1,
+         "fileType" : "TXT",
+         "path" : "C:/Users/HYGK/Desktop/TAUAUTO/TAUAUTO/TAUAUTO/dataFiles/templateDispersionFiles/dispersionData_2/position_1",
+         "skipHeader" : 3
+      }
+   ],
+   "samplePoints" : [ 0.0, 20.75, 48.75, 66.0, 68.0, 95.75, 130.0 ],
+   "unmOfSegments" : [ 0, 0, 0, 0, 0, 0 ]
+}

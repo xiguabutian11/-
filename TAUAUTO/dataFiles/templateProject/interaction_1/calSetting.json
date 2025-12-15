@@ -1,0 +1,27 @@
+{
+  //计算序列数组，每一个元素代表一次扫参运算
+  "calSetting":
+  [
+    {
+      "name": "sequence1",
+      "seq":
+      [
+        {
+          "sign": "frequency",
+          "stateSign": 0,
+          "array": [17.1,18.5,19.6,21.1]
+        },
+        {
+          "sign": "pin",
+          "stateSign": 0,
+          "array": [0.3]
+        },
+        {
+          "sign": "v1",
+          "stateSign": 0,
+          "array": [17000]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+   "parLinks" : [
+      {
+         "dataType" : "tubeData",
+         "description" : "1",
+         "expression" : "v1",
+         "index1" : 1,
+         "index2" : 0,
+         "index3" : 0
+      },
+      {
+         "dataType" : "magData",
+         "description" : "1",
+         "expression" : "mag1",
+         "index1" : 1,
+         "index2" : 1,
+         "index3" : 1
+      }
+   ]
+}

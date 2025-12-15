@@ -1,0 +1,11 @@
+{
+   "current" : 0.014999999999999999,
+   "fullOutput" : 0,
+   "harmonic" : 3,
+   "interstep" : 0.01,
+   "numsOfE" : 96,
+   "outForCollector" : 0,
+   "stability" : 0,
+   "tubeLength" : 120.0,
+   "voltage" : 16000.0
+}

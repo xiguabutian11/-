@@ -1,0 +1,13 @@
+{
+   "calSetting" : [
+      {
+         "name" : "sequence1",
+         "seq" : [
+            {
+               "array" : [ 17000.0 ],
+               "sign" : "voltage"
+            }
+         ]
+      }
+   ]
+}

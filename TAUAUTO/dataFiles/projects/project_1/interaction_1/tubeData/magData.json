@@ -1,0 +1,18 @@
+{
+   "magnetic" : [
+      {
+         "AMP" : 0.19,
+         "DcAMP" : 0.0,
+         "QuadAMP" : 0.0,
+         "begin" : 0,
+         "period" : 8.4
+      },
+      {
+         "AMP" : 0.25,
+         "DcAMP" : 0.0,
+         "QuadAMP" : 0.0,
+         "begin" : 92.4,
+         "period" : 8
+      }
+   ]
+}

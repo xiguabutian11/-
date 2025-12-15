@@ -1,0 +1,396 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="头文件\tauLib">
+      <UniqueIdentifier>{7f5dc3d0-fd8c-40b0-9573-51c99073f232}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\tauLib">
+      <UniqueIdentifier>{78fc6fae-ca0f-45d9-a9f5-56aef12c5a9c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\constData">
+      <UniqueIdentifier>{99a5b4dc-8e0c-495f-96df-8d8d814a088b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="头文件\fileReadAndWrite">
+      <UniqueIdentifier>{07dbc85c-6eeb-415a-8c5b-f2c6750ea402}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\fileReadAndWrite">
+      <UniqueIdentifier>{a52b8a96-2385-4de4-8b55-2ca024054830}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\myException">
+      <UniqueIdentifier>{c29fcf29-f0d9-417b-aa70-b3d57355b94a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\thirdPtyLibs">
+      <UniqueIdentifier>{43d627aa-0e8c-4e1b-928e-e456b852301c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\thirdPtyLibs">
+      <UniqueIdentifier>{3cdaa73b-abfc-4027-9356-1c90fb1bbf56}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\commonFuncs">
+      <UniqueIdentifier>{c1157dff-0c76-46a8-806d-ef98adf5a949}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\commonFuncs">
+      <UniqueIdentifier>{8193588b-60a3-40c2-8dd5-b09de6f3b29c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\projManage">
+      <UniqueIdentifier>{a523c481-c0af-4eba-8260-4af71436ea42}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\projManage">
+      <UniqueIdentifier>{aa6d9960-28e6-41c3-af09-fba19c328995}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\paramAndUnit">
+      <UniqueIdentifier>{5258e866-f259-453a-853c-0f598cfa47bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\paramAndUnit">
+      <UniqueIdentifier>{124560e9-1dcf-4783-a7d8-c7385289b815}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\paramScan">
+      <UniqueIdentifier>{587b71ec-185f-49b7-a469-077c18efa0e4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\ctlDataUpdate">
+      <UniqueIdentifier>{b8358cb5-2b42-4e4d-8827-98ef23949cc0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\paramScan">
+      <UniqueIdentifier>{4d079a7b-7fc2-47c9-af91-e16d6f0961e9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\calculation">
+      <UniqueIdentifier>{4b34b24d-4972-498d-a4e7-6b4d7d5c5204}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\calculation">
+      <UniqueIdentifier>{1a73c362-0e09-4c13-ab17-f8e701150d46}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\disperDataProcess">
+      <UniqueIdentifier>{f7eb9c9a-c0ec-4488-9fb1-b3d3c4b7c50f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\disperDataProcess">
+      <UniqueIdentifier>{937f559c-7ca5-41c6-b4b3-5d799786a222}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\ctlDataUpdate">
+      <UniqueIdentifier>{03f3b6d3-02b0-4e08-a95d-73180fa00b90}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\resultProcess">
+      <UniqueIdentifier>{dbeaa729-2a6e-4f95-9512-d5cd4f49c056}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\resultProcess">
+      <UniqueIdentifier>{7bcfa573-ef9f-41f9-9ef9-8a827e1bc452}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\lossDataProcess">
+      <UniqueIdentifier>{cab2d62c-bdeb-4a82-a42b-7d2656401e31}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\lossDataProcess">
+      <UniqueIdentifier>{50ec7221-4153-42d2-bdc5-12ab857ed2bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\usrDataInfo">
+      <UniqueIdentifier>{8d601469-d68b-4c6e-895b-34fa827deb64}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\usrDataInfo">
+      <UniqueIdentifier>{da9dc99b-ac8f-45c4-8738-4850adf26812}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="tauLib\sources\constrpar.cpp">
+      <Filter>源文件\tauLib</Filter>
+    </ClCompile>
+    <ClCompile Include="tauLib\sources\TauInteraction.cpp">
+      <Filter>源文件\tauLib</Filter>
+    </ClCompile>
+    <ClCompile Include="TAU.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="filesReadAndWrite\fileWriting.cpp">
+      <Filter>源文件\fileReadAndWrite</Filter>
+    </ClCompile>
+    <ClCompile Include="filesReadAndWrite\fileReading.cpp">
+      <Filter>源文件\fileReadAndWrite</Filter>
+    </ClCompile>
+    <ClCompile Include="thirdPtyLibs\json\jsoncpp.cpp">
+      <Filter>源文件\thirdPtyLibs</Filter>
+    </ClCompile>
+    <ClCompile Include="commonFuncs\funcs.cpp">
+      <Filter>源文件\commonFuncs</Filter>
+    </ClCompile>
+    <ClCompile Include="filesReadAndWrite\readCheck.cpp">
+      <Filter>源文件\fileReadAndWrite</Filter>
+    </ClCompile>
+    <ClCompile Include="commonFuncs\formula.cpp">
+      <Filter>源文件\commonFuncs</Filter>
+    </ClCompile>
+    <ClCompile Include="projManage\projManage.cpp">
+      <Filter>源文件\projManage</Filter>
+    </ClCompile>
+    <ClCompile Include="paramAndUnit\parameter.cpp">
+      <Filter>源文件\paramAndUnit</Filter>
+    </ClCompile>
+    <ClCompile Include="commonFuncs\funcsTwo.cpp">
+      <Filter>源文件\commonFuncs</Filter>
+    </ClCompile>
+    <ClCompile Include="paramScan\paramScan.cpp">
+      <Filter>源文件\paramScan</Filter>
+    </ClCompile>
+    <ClCompile Include="calculation\calculation.cpp">
+      <Filter>源文件\calculation</Filter>
+    </ClCompile>
+    <ClCompile Include="disperDataProcess\dispDtProcess.cpp">
+      <Filter>源文件\disperDataProcess</Filter>
+    </ClCompile>
+    <ClCompile Include="ctlDataUpdate\ctlData.cpp">
+      <Filter>源文件\ctlDataUpdate</Filter>
+    </ClCompile>
+    <ClCompile Include="resultProcess\resultPro.cpp">
+      <Filter>源文件\resultProcess</Filter>
+    </ClCompile>
+    <ClCompile Include="lossDataProcess\lossDataProcess.cpp">
+      <Filter>源文件\lossDataProcess</Filter>
+    </ClCompile>
+    <ClCompile Include="usrDataInfo\usrData.cpp">
+      <Filter>源文件\usrDataInfo</Filter>
+    </ClCompile>
+    <ClCompile Include="usrDataInfo\usrDataSet.cpp">
+      <Filter>源文件\usrDataInfo</Filter>
+    </ClCompile>
+    <ClCompile Include="usrDataInfo\usrDataCheck.cpp">
+      <Filter>源文件\usrDataInfo</Filter>
+    </ClCompile>
+    <ClCompile Include="tauLib\headers\TauEigen.cpp">
+      <Filter>源文件\tauLib</Filter>
+    </ClCompile>
+    <ClCompile Include="cal_change\calsetting_change.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="cal_change\DataGet.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="dataFiles\ctlDataUpdate\ctlData.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="SESAN1\SESAN\data_get\SeSan_get.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="SESAN1\SESAN\exe\jisuan\Jisuan.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="SESAN1\SESAN\jisuan\Jisuan.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="SESAN1\SESAN\judgeANDchange\change_units.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="SESAN1\SESAN\judgeANDchange\judge.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="SESAN1\SESAN\shuchu\shuchu.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="SESAN1\SESAN\writeANDread\read.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="SESAN1\SESAN\writeANDread\write.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="SESAN1\SESAN\YOUHUA\tiaozheng.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="SESAN1\SESAN\YOUHUA\youhua.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="SESAN1\SESAN\YuChuLi\first_param.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="SESAN1\SESAN\SeSanJieGou.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="SESAN1\SESAN\sesanjiegou\constpar.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="SESAN1\SESAN\sesanjiegou\sesan.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="SESAN1\SESAN\sesanjiegou\TauEigen.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="cal_change\find_voltage.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="NEW\tube_length.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="NEW\gongshi.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="constData\structDefine.h">
+      <Filter>头文件\constData</Filter>
+    </ClInclude>
+    <ClInclude Include="tauLib\headers\constpar.h">
+      <Filter>头文件\tauLib</Filter>
+    </ClInclude>
+    <ClInclude Include="tauLib\headers\params.h">
+      <Filter>头文件\tauLib</Filter>
+    </ClInclude>
+    <ClInclude Include="tauLib\headers\TauEigen.h">
+      <Filter>头文件\tauLib</Filter>
+    </ClInclude>
+    <ClInclude Include="tauLib\headers\TauInteraction.h">
+      <Filter>头文件\tauLib</Filter>
+    </ClInclude>
+    <ClInclude Include="filesReadAndWrite\fileWriting.h">
+      <Filter>头文件\fileReadAndWrite</Filter>
+    </ClInclude>
+    <ClInclude Include="constData\constInfo.h">
+      <Filter>头文件\constData</Filter>
+    </ClInclude>
+    <ClInclude Include="filesReadAndWrite\fileReading.h">
+      <Filter>头文件\fileReadAndWrite</Filter>
+    </ClInclude>
+    <ClInclude Include="thirdPtyLibs\ExprTk\exprtk.hpp">
+      <Filter>头文件\thirdPtyLibs</Filter>
+    </ClInclude>
+    <ClInclude Include="commonFuncs\funcs.h">
+      <Filter>头文件\commonFuncs</Filter>
+    </ClInclude>
+    <ClInclude Include="thirdPtyLibs\rapidcsv\rapidcsv.h">
+      <Filter>头文件\thirdPtyLibs</Filter>
+    </ClInclude>
+    <ClInclude Include="thirdPtyLibs\json\json.h">
+      <Filter>头文件\thirdPtyLibs</Filter>
+    </ClInclude>
+    <ClInclude Include="thirdPtyLibs\json\json-forwards.h">
+      <Filter>头文件\thirdPtyLibs</Filter>
+    </ClInclude>
+    <ClInclude Include="filesReadAndWrite\readCheck.h">
+      <Filter>头文件\fileReadAndWrite</Filter>
+    </ClInclude>
+    <ClInclude Include="constData\constDataInfo.h">
+      <Filter>头文件\constData</Filter>
+    </ClInclude>
+    <ClInclude Include="commonFuncs\formula.h">
+      <Filter>头文件\commonFuncs</Filter>
+    </ClInclude>
+    <ClInclude Include="projManage\projManage.h">
+      <Filter>头文件\projManage</Filter>
+    </ClInclude>
+    <ClInclude Include="paramAndUnit\parameter.h">
+      <Filter>头文件\paramAndUnit</Filter>
+    </ClInclude>
+    <ClInclude Include="commonFuncs\funcsTwo.h">
+      <Filter>头文件\commonFuncs</Filter>
+    </ClInclude>
+    <ClInclude Include="paramScan\paramScan.h">
+      <Filter>头文件\paramScan</Filter>
+    </ClInclude>
+    <ClInclude Include="ctlDataUpdate\ctlData.h">
+      <Filter>头文件\ctlDataUpdate</Filter>
+    </ClInclude>
+    <ClInclude Include="thirdPtyLibs\BSThreadPool\BS_thread_pool.hpp">
+      <Filter>头文件\thirdPtyLibs</Filter>
+    </ClInclude>
+    <ClInclude Include="calculation\calculation.h">
+      <Filter>头文件\calculation</Filter>
+    </ClInclude>
+    <ClInclude Include="disperDataProcess\dispDtProcess.h">
+      <Filter>头文件\disperDataProcess</Filter>
+    </ClInclude>
+    <ClInclude Include="resultProcess\resultPro.h">
+      <Filter>头文件\resultProcess</Filter>
+    </ClInclude>
+    <ClInclude Include="lossDataProcess\lossDataProcess.h">
+      <Filter>头文件\lossDataProcess</Filter>
+    </ClInclude>
+    <ClInclude Include="usrDataInfo\usrData.h">
+      <Filter>头文件\usrDataInfo</Filter>
+    </ClInclude>
+    <ClInclude Include="usrDataInfo\usrDataSet.h">
+      <Filter>头文件\usrDataInfo</Filter>
+    </ClInclude>
+    <ClInclude Include="usrDataInfo\usrDataCheck.h">
+      <Filter>头文件\usrDataInfo</Filter>
+    </ClInclude>
+    <ClInclude Include="cal_change\calsetting_change.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="cal_change\DataGet.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="dataFiles\ctlDataUpdate\ctlData.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="TAU.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="SESAN1\DATA\data_start.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="SESAN1\SESAN\data_get\SeSan_get.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="SESAN1\SESAN\exe\jisuan\Jisuan.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="SESAN1\SESAN\jisuan\Jisuan.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="SESAN1\SESAN\judgeANDchange\change_units.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="SESAN1\SESAN\judgeANDchange\judge.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="SESAN1\SESAN\parameter\parameter.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="SESAN1\SESAN\shuchu\shuchu.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="SESAN1\SESAN\writeANDread\read.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="SESAN1\SESAN\writeANDread\write.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="SESAN1\SESAN\YOUHUA\youhua.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="SESAN1\SESAN\YuChuLi\first_param.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="SESAN1\SESAN\SeSanJieGou.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="SESAN1\SESAN\sesanjiegou\constpar.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="SESAN1\SESAN\sesanjiegou\params.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="SESAN1\SESAN\sesanjiegou\TauEigen.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="SESAN1\SESAN\sesanjiegou\sesan.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="cal_change\find_voltage.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="NEW\tube_length.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="NEW\gongshi.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

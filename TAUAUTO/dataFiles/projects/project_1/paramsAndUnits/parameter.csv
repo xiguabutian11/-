@@ -1,0 +1,17 @@
+name,expression,description
+exampleexample,120*10+3,example parameter
+l1,8,
+l2,l1-20,
+m1,l3/10,
+l3,50,
+v1,18500,
+v2,v1*1.2,
+mag1,91.4,
+mag2,mag1*1.6,
+x4,(l1*2)^0.5,
+x5,x6+1,
+x6,x4+l3,
+x7_,x8_1-1,
+x8_1,l1+l2++l3,
+21fawdw 1,2222,
+x432,l1*3+l3/2-m1+x6,

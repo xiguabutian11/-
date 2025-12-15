@@ -1,0 +1,200 @@
+{
+   "dispGroup" : [
+      {
+         "name" : "pos_1",
+         "fileType" : "TXT",
+         "path" : "C:/Users/HYGK/Desktop/TauCalculation/pronew_1/position_1",
+         "skipHeader" : 3
+//         "kc": {
+//            "freq": [],
+//            "val": [1,2,3,4]
+//         },
+//         "vp": {
+//            "freq": [1,2,3,4],
+//            "val": [1,2,3,4]
+//         },
+//         "alpha": {
+//            "freq": [1,2,3,4],
+//            "val": [1,2,3,4]
+//         }
+      },
+      {
+         "name" : "pos_2",
+         "fileType" : "TXT",
+         "path" : "C:/Users/HYGK/Desktop/TauCalculation/pronew_1/position_2",
+         "skipHeader" : 3
+      },
+      {
+         "name" : "pos_3",
+         "fileType" : "TXT",
+         "path" : "C:/Users/HYGK/Desktop/TauCalculation/pronew_1/position_3",
+         "skipHeader" : 3
+      },
+      {
+         "name" : "pos_4",
+         "fileType" : "TXT",
+         "path" : "C:/Users/HYGK/Desktop/TauCalculation/pronew_1/position_4",
+         "skipHeader" : 3
+      },
+      {
+         "name" : "pos_5",
+         "fileType" : "TXT",
+         "path" : "C:/Users/HYGK/Desktop/TauCalculation/pronew_1/position_5",
+         "skipHeader" : 3
+      },
+      {
+         "name" : "pos_6",
+         "fileType" : "TXT",
+         "path" : "C:/Users/HYGK/Desktop/TauCalculation/pronew_1/position_6",
+         "skipHeader" : 3
+      },
+      {
+         "name" : "pos_7",
+         "fileType" : "TXT",
+         "path" : "C:/Users/HYGK/Desktop/TauCalculation/pronew_1/position_7",
+         "skipHeader" : 3
+      },
+      {
+         "name" : "pos_8",
+         "fileType" : "TXT",
+         "path" : "C:/Users/HYGK/Desktop/TauCalculation/pronew_1/position_8",
+         "skipHeader" : 3
+      },
+      {
+         "name" : "pos_9",
+         "fileType" : "TXT",
+         "path" : "C:/Users/HYGK/Desktop/TauCalculation/pronew_1/position_9",
+         "skipHeader" : 3
+      },
+      {
+         "name" : "pos_10",
+         "fileType" : "TXT",
+         "path" : "C:/Users/HYGK/Desktop/TauCalculation/pronew_1/position_10",
+         "skipHeader" : 3
+      },
+      {
+         "name" : "pos_11",
+         "fileType" : "TXT",
+         "path" : "C:/Users/HYGK/Desktop/TauCalculation/pronew_1/position_11",
+         "skipHeader" : 3
+      },
+      {
+         "name" : "pos_12",
+         "fileType" : "TXT",
+         "path" : "C:/Users/HYGK/Desktop/TauCalculation/pronew_1/position_12",
+         "skipHeader" : 3
+      },
+      {
+         "name" : "pos_13",
+         "fileType" : "TXT",
+         "path" : "C:/Users/HYGK/Desktop/TauCalculation/pronew_1/position_13",
+         "skipHeader" : 3
+      }
+   ],
+   "samplePoints" : [
+      {
+         "point": 0,
+         "dispKey": "pos_1",
+         "fixedNumber": 3,
+         "interpoType": 0,
+         "pointInsertType":1,
+         "fixedLength": 5
+      },
+      {
+         "point": 25.74,
+         "dispKey": "pos_2",
+         "fixedNumber": 3,
+         "interpoType": 0,
+         "pointInsertType":1,
+         "fixedLength": 5
+      },
+      {
+         "point": 46.761,
+         "dispKey": "pos_3",
+         "fixedNumber": 3,
+         "interpoType": 0,
+         "pointInsertType":1,
+         "fixedLength": 5
+      },
+      {
+         "point": 73.986,
+         "dispKey": "pos_4",
+         "fixedNumber": 0,
+         "interpoType": 0,
+         "pointInsertType":0,
+         "fixedLength": 0
+      },
+      {
+         "point": 75.986,
+         "dispKey": "pos_5",
+         "fixedNumber": 3,
+         "interpoType": 0,
+         "pointInsertType":1,
+         "fixedLength": 4
+      },
+      {
+         "point": 92.2605,
+         "dispKey": "pos_6",
+         "fixedNumber": 3,
+         "interpoType": 0,
+         "pointInsertType":1,
+         "fixedLength": 1
+      },
+      {
+         "point": 94.4,
+         "dispKey": "pos_7",
+         "fixedNumber": 1,
+         "interpoType": 0,
+         "pointInsertType":1,
+         "fixedLength": 3
+      },
+      {
+         "point": 101,
+         "dispKey": "pos_8",
+         "fixedNumber": 3,
+         "interpoType": 0,
+         "pointInsertType":1,
+         "fixedLength": 2
+      },
+      {
+         "point": 103.2,
+         "dispKey": "pos_9",
+         "fixedNumber": 3,
+         "interpoType": 0,
+         "pointInsertType":1,
+         "fixedLength": 5
+      },
+      {
+         "point": 114.6758,
+         "dispKey": "pos_10",
+         "fixedNumber": 3,
+         "interpoType": 0,
+         "pointInsertType":1,
+         "fixedLength": 5
+      },
+      {
+         "point": 128.5193,
+         "dispKey": "pos_11",
+         "fixedNumber": 3,
+         "interpoType": 0,
+         "pointInsertType":1,
+         "fixedLength": 5
+      },
+      {
+         "point": 147.095,
+         "dispKey": "pos_12",
+         "fixedNumber": 3,
+         "interpoType": 0,
+         "pointInsertType":1,
+         "fixedLength": 5
+      },
+      {
+         "point": 164.8,
+         "dispKey": "pos_13",
+         "fixedNumber": 5,
+         "interpoType": 0,
+         "pointInsertType":1,
+         "fixedLength": 5
+      }
+   ]
+}
