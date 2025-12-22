@@ -114,4 +114,91 @@ double BEST::bestvoltage3(double V,double fre, double I, double Vjiange) {
 
 }
 
+double BEST::bestfre()
+{
+    std::vector<FreqResult> freqResults;
+
+    for (double frequency : {minfre, maxfre, (minfre + maxfre) / 2.0}) {
+        datachange::changecalsetting("frequency", frequency);
+
+        filesystem::path projectPath = Projectpath;
+        usrData& data = usrData::getInstance();
+
+        if (!projManage::openProj(projectPath.string())) {
+            for (auto& msg : data.curCalGroup.message) {
+                std::cerr << msg.str << std::endl;
+            }
+            continue;
+        }
+
+        // 执行计算
+        calculation::seqCalculate();
+        calculation::waitForAllTasks();
+
+        // 获取当前频点结果
+        for (auto& seq : data.curCalGroup.res.reses) {
+            for (auto& res : seq.second) {
+                if (!res.result.Pout.empty()) {
+                    const std::vector<double>& poutArray = res.result.Pout[0];
+                    int lastIndex = poutArray.size() - 1;
+
+                    // 找到最大值和位置
+                    auto maxIt = std::max_element(poutArray.begin(), poutArray.end());
+                    double maxPower = *maxIt;
+                    int maxPos = std::distance(poutArray.begin(), maxIt);
+
+                    // 判断是否过饱和：最大值不在最后一个点就是过饱和
+                    bool isOverSaturated = (maxPos != lastIndex);
+
+                    freqResults.push_back({ frequency, maxPower, maxPos, isOverSaturated });
+                }
+            }
+        }
+    }
+
+    // 分析频点数据
+    double bestFrequency = 0;
+    
+    if (!freqResults.empty()) {
+        // 分离过饱和和不过饱和的频点
+        std::vector<FreqResult> overSaturated;
+        std::vector<FreqResult> notSaturated;
+
+        for (const auto& res : freqResults) {
+            if (res.isOverSaturated) {
+                overSaturated.push_back(res);
+            }
+            else {
+                notSaturated.push_back(res);
+            }
+        }
+
+        // 决策逻辑
+        if (!notSaturated.empty()) {
+            // 存在不过饱和的频点，取最大值最小的
+            auto bestIt = std::min_element(notSaturated.begin(), notSaturated.end(),
+                [](const auto& a, const auto& b) { return a.maxPower < b.maxPower; });
+            bestFrequency = bestIt->frequency;
+        }
+        else {
+            // 都过饱和，取最大值位置最大的（离终点最远）
+            auto bestIt = std::max_element(overSaturated.begin(), overSaturated.end(),
+                [](const auto& a, const auto& b) { return a.maxPosition < b.maxPosition; });
+            bestFrequency = bestIt->frequency;
+        }
+    }
+
+    // 输出结果
+    std::cout << "\n============== 频点扫描结果 ==============" << std::endl;
+    for (const auto& res : freqResults) {
+        std::cout << "频点: " << res.frequency << "GHz, "
+            << "最大功率: " << res.maxPower << "W, "
+            << "位置: " << res.maxPosition << ", "
+            << (res.isOverSaturated ? "过饱和" : "不过饱和") << std::endl;
+    }
+
+    std::cout << "\n最终选择频点: " << bestFrequency << " GHz" << std::endl;
+
+    return bestFrequency;
+}
 

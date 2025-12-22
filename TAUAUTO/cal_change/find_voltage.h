@@ -18,6 +18,14 @@ struct SimulationResult {               //正常数据存储的结构体
     double avg;
 };
 
+
+struct FreqResult {
+    double frequency;          // 频率
+    double maxPower;           // 最大值
+    int maxPosition;           // 最大值位置索引
+    bool isOverSaturated;      // 是否过饱和
+};
+
 class BEST {
     double D = 1;
     double A = 1;
@@ -32,4 +40,6 @@ class BEST {
 
 public:
     double bestvoltage3(double V, double fre, double I, double Vjiange);
+
+    double bestfre();
 };

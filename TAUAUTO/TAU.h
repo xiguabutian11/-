@@ -19,6 +19,11 @@
 #include <iostream>
 #include"DATA/data_start.h"
 
+#include"SeSanJieGou.h"
+#include"NEW/tube_length.h"
+#include"NEW/gongshi.h"
+#include"cal_change/find_voltage.h"
+
 struct PowerResult {
     double maxOutputPower;      // ×î´óÊä³ö¹¦ÂÊ
     int maxPowerPoint;          // ×î´ó¹¦ÂÊ¶ÔÓ¦µÄµãÊı
@@ -42,3 +47,5 @@ double smallpin(double guanzi_type, double L);   //·µ»ØĞ¡ĞÅºÅÊäÈë¹¦ÂÊ£¬Í¬Ê±¸ü¸ÄÁ
 SaturationResult best_pin1(double fre, double V, double initialPin, double L);
 
 double mag_judge(double fre, double pin, double voltage, double mag_A, double mag_period);
+
+double voltage_YOUHUA(double bestV,double test_voltage);

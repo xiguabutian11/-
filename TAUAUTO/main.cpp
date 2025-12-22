@@ -1,7 +1,5 @@
-#include"SeSanJieGou.h"
-#include"NEW/tube_length.h"
-#include"NEW/gongshi.h"
-#include"cal_change/find_voltage.h"
+#include"TAU.h"
+
 
 
 
@@ -157,54 +155,68 @@ int main(){
 		}
 	}
 	std::cout << "最佳电压处于范围内" << std::endl;
-	std::cout << "开始管长调制" << std::endl;
+
 	//---------------回归双段管子----------------
 	datachange::lossDataChange(1, 20, 22, 24, 26);
+	//---------------管长和输入功率固定----------------
+	datachange::changecalsetting("pin",0.01 );
+	datachange::tubeDataChange("tubeLength", 100);
+	//================对多个频点进行比较================(此处可能需要加个多频点的磁场检测)
+	double bestfre = liu.bestfre();
 
-	//--------------管长优化---------------
-	lengthstruct lengths = youhua_length(2,length, Gain, fre, small_pin, bestV);
-	//--------------三频点(左右频点与中心频点)磁场优化------------
-	while (
-		mag_judge(fre, small_pin, V, mag_A, mag_period) == 0||
-		mag_judge(minfre, small_pin, V, mag_A, mag_period) == 0||
-		mag_judge(maxfre, small_pin, V, mag_A, mag_period) == 0
-		)
-	{
-		mag_A += 0.01;
-		datachange::mag(mag_A, mag_period);
-	}
-	mag_A = mag1(V, r1, I, 1.8);
-	
-	//--------------带宽优化---------------
-	SaturationResult powerresult = best_pin1(fre, bestV, mostpin * 0.5, lengths.final_length);
-	double T = 0;
-	while (powerresult.maxOutputPower < Pout)
-	{
-		T = T + 2;
+	////--------------管长优化---------------
+	//lengthstruct lengths = youhua_length(2,length, Gain, fre, small_pin, bestV);
+	////--------------三频点(左右频点与中心频点)磁场优化------------
+	//while (
+	//	mag_judge(fre, small_pin, V, mag_A, mag_period) == 0||
+	//	mag_judge(minfre, small_pin, V, mag_A, mag_period) == 0||
+	//	mag_judge(maxfre, small_pin, V, mag_A, mag_period) == 0
+	//	)
+	//{
+	//	mag_A += 0.01;
+	//	datachange::mag(mag_A, mag_period);
+	//}
+	//mag_A = mag1(V, r1, I, 1.8);
+	//
+	////--------------带宽优化---------------
+	//SaturationResult powerresult = best_pin1(fre, bestV, mostpin * 0.5, lengths.final_length);
+	//SaturationResult powerresult1 = best_pin1(minfre, bestV, mostpin * 0.5, lengths.final_length);
+	//SaturationResult powerresult2 = best_pin1(maxfre, bestV, mostpin * 0.5, lengths.final_length);
+	//double T = 0;
+	//while (powerresult.maxOutputPower < Pout||
+	//	powerresult1.maxOutputPower < Pout||
+	//	powerresult2.maxOutputPower < Pout
+	//	)
+	//{
+	//	T = T + 2;
 
-		jiegou = YOUHUA_sesan(minfre, maxfre, test_voltage, Pout, T);
-		r = 1000 * jiegou.Ra;
-		datachange::beamDataChange("outerR", r / 2);
-		datachange::beamDataChange("tunnelR", r);
+	//	jiegou = YOUHUA_sesan(minfre, maxfre, test_voltage, Pout, T);
+	//	r = 1000 * jiegou.Ra;
+	//	datachange::beamDataChange("outerR", r / 2);
+	//	datachange::beamDataChange("tunnelR", r);
 
-		convertTxtToJson(outputPath, dispdatapath, minfre - 1, maxfre + 1);
-		//--------------管长优化---------------
-		lengths = youhua_length(2,lengths.final_length, Gain, fre, small_pin, bestV);
-		//--------------磁场优化------------
-		while (mag_judge(fre, small_pin, V, mag_A, mag_period) == 0)
-		{
-			mag_A += 0.01;
-			mag_period = mag2(V, r / 2, I);
-			datachange::mag(mag_A, mag_period);
-		}
-		mag_A = mag1(V, r1, I, 1.8);
-		//----------------------------------
-		powerresult = best_pin1(fre, bestV,0.15, lengths.final_length);         //best_pin初始输入功率是手打的
-	}
-	std::cout << "右端点输出" << std::endl;
-	HuZuoYong(maxfre, powerresult.optimalPin, bestV);
-	std::cout << "左端点输出" << std::endl;
-	HuZuoYong(minfre, powerresult.optimalPin, bestV);
-	std::cout << "管子设计结束" << std::endl;
+	//	convertTxtToJson(outputPath, dispdatapath, minfre - 1, maxfre + 1);
+	//	//--------------管长优化---------------
+	//	lengths = youhua_length(2,lengths.final_length, Gain, fre, small_pin, bestV);
+	//	//--------------三点磁场优化------------
+	//	while (mag_judge(fre, small_pin, V, mag_A, mag_period) == 0||
+	//	mag_judge(minfre, small_pin, V, mag_A, mag_period) == 0||
+	//	mag_judge(maxfre, small_pin, V, mag_A, mag_period) == 0)
+	//	{
+	//		mag_A += 0.01;
+	//		mag_period = mag2(V, r / 2, I);
+	//		datachange::mag(mag_A, mag_period);
+	//	}    
+	//	mag_A = mag1(V, r1, I, 1.8);
+	//	//----------------------------------
+	//	powerresult = best_pin1(fre, bestV, mostpin * 0.5, lengths.final_length);         //best_pin初始输入功率是手打的
+	//	powerresult1 = best_pin1(minfre, bestV, mostpin * 0.5, lengths.final_length);
+	//	powerresult2 = best_pin1(maxfre, bestV, mostpin * 0.5, lengths.final_length);
+	//}
+	////---------添加一个增益检测----------
+
+
+	////===================================
+	//std::cout << "管子设计结束" << std::endl;
 
 }

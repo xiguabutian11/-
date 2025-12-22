@@ -350,3 +350,63 @@ double mag_judge(double fre, double pin, double voltage,double mag_A,double mag_
         return 0.0;
     }
 }
+
+double voltage_YOUHUA(double bestV, double test_voltage) {
+    double F = 0;
+    double r = 0;
+    double small_pin = 0;
+    while (bestV < V - Vcha || bestV > V + Vcha)
+    {
+        if (bestV < V - Vcha)
+        {
+            std::cout << "最佳电压低于目标范围" << std::endl;
+            if (F == 1) { V_change = V_change / 2; }
+            test_voltage = test_voltage + V_change;
+
+            LXjiegou jiegou = YOUHUA_sesan(minfre, maxfre, test_voltage, Pout, 0);//调整色散结构
+            r = 1000 * jiegou.Ra;
+            datachange::beamDataChange("outerR", r / 2);
+            datachange::beamDataChange("tunnelR", r);
+            convertTxtToJson(outputPath, dispdatapath, minfre - 1, maxfre + 1);//传入色散数据
+
+            small_pin = smallpin(1, length);//小信号
+            //--------------磁场优化------------
+            while (mag_judge(fre, small_pin, V, mag_A, mag_period) == 0)
+            { 
+                mag_A += 0.01;
+                mag_period = mag2(V, r / 2, I);
+                datachange::mag(mag_A, mag_period);
+            }
+            mag_A = mag1(V, r1, I, 1.8);
+            //----------------------------------
+            bestV = liu.bestvoltage3(V, fre, I, Vjiange);//寻找最佳电压
+            F = -1;
+        }
+        else if (bestV > V + Vcha)
+        {
+            std::cout << "最佳电压高于目标范围" << std::endl;
+            if (F == -1) { V_change = V_change / 2; }
+            test_voltage = test_voltage - V_change;
+
+            jiegou = YOUHUA_sesan(minfre, maxfre, test_voltage, Pout, 0);
+            r = 1000 * jiegou.Ra;
+            datachange::beamDataChange("outerR", r / 2);
+            datachange::beamDataChange("tunnelR", r);
+
+            convertTxtToJson(outputPath, dispdatapath, minfre - 1, maxfre + 1);
+            small_pin = smallpin(1, length);
+            //--------------磁场优化------------
+            while (mag_judge(fre, small_pin, V, mag_A, mag_period) == 0)
+            {
+                mag_A += 0.01;
+                mag_period = mag2(V, r / 2, I);
+                datachange::mag(mag_A, mag_period);
+            }
+            mag_A = mag1(V, r1, I, 1.8);
+            //----------------------------------
+            bestV = liu.bestvoltage3(V, fre, I, Vjiange);
+            F = 1;
+        }
+    }
+    std::cout << "最佳电压处于范围内" << std::endl;
+}
