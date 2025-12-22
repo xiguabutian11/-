@@ -14,8 +14,7 @@ int main(){
 	BEST liu;
 	LXjiegou jiegou = YOUHUA_sesan(minfre, maxfre, V, Pout, 0);
 	double r = 1000 * jiegou.Ra;                //单位mm 
-	double r1 = 0.5*r;                          //单位mm  
-	datachange::beamDataChange("outerR", r1);
+	datachange::beamDataChange("outerR", 0.5*r);
 	datachange::beamDataChange("tunnelR", r);
 	
 	convertTxtToJson(outputPath, dispdatapath, minfre-1, maxfre+1);
@@ -24,7 +23,7 @@ int main(){
 	//--------------管长和磁场的初始化---------------
 	double length = jiegou.L*1000*20+30;
 	datachange::tubeDataChange("tubeLength", length);
-	double mag_A = mag1(V,r1,I,1.8);
+	double mag_A = mag1(V, 0.5 * r,I,1.8);
 	double mag_period = mag2(V, r/2, I);
 	datachange::mag(mag_A, mag_period);
 	//--------------磁场优化------------
@@ -33,7 +32,7 @@ int main(){
 		mag_A += 0.01;
 		datachange::mag(mag_A, mag_period);
 	}
-	mag_A = mag1(V, r1, I, 1.8);
+	mag_A = mag1(V, 0.5 * r, I, 1.8);
     //========简单优化电压==========
 	double startV=liu.bestvoltage3(V, fre, I, Vjiange);
 	double start_voltage = V;
@@ -60,7 +59,7 @@ int main(){
 				mag_period = mag2(V, r / 2, I);
 				datachange::mag(mag_A, mag_period);
 			}
-			mag_A = mag1(V, r1, I, 1.8);
+			mag_A = mag1(V, 0.5 * r, I, 1.8);
 			//----------------------------------
 			startV = liu.bestvoltage3(V, fre, I, Vjiange);//寻找最佳电压
 			F = -1;
@@ -85,7 +84,7 @@ int main(){
 				mag_period = mag2(V, r / 2, I);
 				datachange::mag(mag_A, mag_period);
 			}
-			mag_A = mag1(V, r1, I, 1.8);
+			mag_A = mag1(V, 0.5 * r, I, 1.8);
 			//----------------------------------
 			startV = liu.bestvoltage3(V, fre, I, Vjiange);
 			F = 1;
@@ -101,66 +100,12 @@ int main(){
 	F = 0;
 	V_change = V_change / 2;
 	//--------------优化电压---------------
-	while (bestV < V - Vcha ||  bestV > V + Vcha)
-	{
-		if (bestV < V - Vcha)
-		{
-			std::cout << "最佳电压低于目标范围" << std::endl;
-			if (F == 1) { V_change = V_change / 2; }
-			test_voltage = test_voltage + V_change;
-
-			jiegou = YOUHUA_sesan(minfre, maxfre, test_voltage, Pout, 0);//调整色散结构
-			r = 1000 * jiegou.Ra;
-			datachange::beamDataChange("outerR", r / 2);
-			datachange::beamDataChange("tunnelR", r);
-			convertTxtToJson(outputPath, dispdatapath, minfre - 1, maxfre + 1);//传入色散数据
-
-			small_pin = smallpin(1,length);//小信号
-			//--------------磁场优化------------
-			while (mag_judge(fre, small_pin, V, mag_A, mag_period) == 0)
-			{
-				mag_A += 0.01;
-				mag_period = mag2(V, r / 2, I);
-				datachange::mag(mag_A, mag_period);
-			}
-			mag_A = mag1(V, r1, I, 1.8);
-			//----------------------------------
-			bestV = liu.bestvoltage3(V,fre, I, Vjiange);//寻找最佳电压
-			F = -1;
-		}
-		else if (bestV > V + Vcha)
-		{
-			std::cout << "最佳电压高于目标范围" << std::endl;
-			if (F == -1) { V_change = V_change / 2; }
-			test_voltage = test_voltage - V_change;
-
-			jiegou = YOUHUA_sesan(minfre, maxfre, test_voltage, Pout, 0);
-			r = 1000 * jiegou.Ra;
-			datachange::beamDataChange("outerR", r / 2);
-			datachange::beamDataChange("tunnelR", r);
-
-			convertTxtToJson(outputPath, dispdatapath, minfre - 1, maxfre + 1);
-			small_pin = smallpin(1,length);
-			//--------------磁场优化------------
-			while (mag_judge(fre, small_pin, V, mag_A, mag_period) == 0)
-			{
-				mag_A += 0.01;
-				mag_period = mag2(V, r / 2, I);
-				datachange::mag(mag_A, mag_period);
-			}
-			mag_A = mag1(V, r1, I, 1.8);
-			//----------------------------------
-			bestV = liu.bestvoltage3(V, fre, I, Vjiange);
-			F = 1;
-		}
-	}
-	std::cout << "最佳电压处于范围内" << std::endl;
-
+	voltage_YOUHUA(bestV, test_voltage, length, mag_A, mag_period);
 	//---------------回归双段管子----------------
 	datachange::lossDataChange(1, 20, 22, 24, 26);
 	//---------------管长和输入功率固定----------------
 	datachange::changecalsetting("pin",0.01 );
-	datachange::tubeDataChange("tubeLength", 100);
+	datachange::tubeDataChange("tubeLength", 300);
 	//================对多个频点进行比较================(此处可能需要加个多频点的磁场检测)
 	double bestfre = liu.bestfre();
 

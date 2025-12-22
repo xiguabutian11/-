@@ -351,10 +351,13 @@ double mag_judge(double fre, double pin, double voltage,double mag_A,double mag_
     }
 }
 
-double voltage_YOUHUA(double bestV, double test_voltage) {
+double voltage_YOUHUA(double bestV, double test_voltage,double length,double mag_A,double mag_period) {
     double F = 0;
     double r = 0;
     double small_pin = 0;
+    double fre = (minfre + maxfre) / 2;
+    double I = DianLiu::way_1(Pout, V, miu);
+    BEST liu;
     while (bestV < V - Vcha || bestV > V + Vcha)
     {
         if (bestV < V - Vcha)
@@ -377,7 +380,7 @@ double voltage_YOUHUA(double bestV, double test_voltage) {
                 mag_period = mag2(V, r / 2, I);
                 datachange::mag(mag_A, mag_period);
             }
-            mag_A = mag1(V, r1, I, 1.8);
+            mag_A = mag1(V, 0.5 * r, I, 1.8);
             //----------------------------------
             bestV = liu.bestvoltage3(V, fre, I, Vjiange);//寻找最佳电压
             F = -1;
@@ -388,7 +391,7 @@ double voltage_YOUHUA(double bestV, double test_voltage) {
             if (F == -1) { V_change = V_change / 2; }
             test_voltage = test_voltage - V_change;
 
-            jiegou = YOUHUA_sesan(minfre, maxfre, test_voltage, Pout, 0);
+            LXjiegou jiegou = YOUHUA_sesan(minfre, maxfre, test_voltage, Pout, 0);
             r = 1000 * jiegou.Ra;
             datachange::beamDataChange("outerR", r / 2);
             datachange::beamDataChange("tunnelR", r);
@@ -402,11 +405,12 @@ double voltage_YOUHUA(double bestV, double test_voltage) {
                 mag_period = mag2(V, r / 2, I);
                 datachange::mag(mag_A, mag_period);
             }
-            mag_A = mag1(V, r1, I, 1.8);
+            mag_A = mag1(V, 0.5 * r, I, 1.8);
             //----------------------------------
             bestV = liu.bestvoltage3(V, fre, I, Vjiange);
             F = 1;
         }
     }
     std::cout << "最佳电压处于范围内" << std::endl;
+    return 1;
 }

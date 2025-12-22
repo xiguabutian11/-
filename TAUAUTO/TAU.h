@@ -48,4 +48,4 @@ SaturationResult best_pin1(double fre, double V, double initialPin, double L);
 
 double mag_judge(double fre, double pin, double voltage, double mag_A, double mag_period);
 
-double voltage_YOUHUA(double bestV,double test_voltage);
+double voltage_YOUHUA(double bestV, double test_voltage, double length, double mag_A, double mag_period);
