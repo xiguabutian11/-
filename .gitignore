@@ -361,3 +361,5 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/TAUAUTO/SESAN1/SESAN/temp
+/TAUAUTO/SESAN1/SESAN/CSV_combined.csv
