@@ -9,7 +9,7 @@ static double minfre = 2;
 static double maxfre = 6;
 static double V = 12500;
 static double Pout = 400;
-static double Gain = 30.0;
+static double Gain = 30;
 static double mostpin = Pout / pow(10, Gain / 10); // 达到目标的最大输入功率
 //-------------------------最佳电压扫描参数-----------------------
 static double Vjiange = 20;    // 电压扫描时的采样间隔数

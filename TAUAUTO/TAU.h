@@ -40,6 +40,13 @@ struct SaturationResult {
     int iterations;             // 迭代次数
 };
 
+struct L_YOUHUA {
+    double gain;           // 实际增益 (dB)
+    double tubeLength;     // 对应管长 (单位与输入一致)
+    double maxPout;        // 最大输出功率
+    double optimalPin;     // 最优输入功率
+};
+
 PowerResult HuZuoYong(double fre, double pin, double voltage);
 
 double smallpin(double guanzi_type, double L);   //返回小信号输入功率，同时更改了计算文件中的输入功率
@@ -48,4 +55,10 @@ SaturationResult best_pin1(double fre, double V, double initialPin, double L);
 
 double mag_judge(double fre, double pin, double voltage, double mag_A, double mag_period);
 
+double voltage_YOUHUA_Brief(double startV, double& start_voltage,double& mag_A, double& mag_period);
+
 double voltage_YOUHUA(double bestV, double test_voltage, double length, double mag_A, double mag_period);
+
+L_YOUHUA L_from_Gain(double Gain1, double m);   //Gain1为目标增益，m为精度大小，该函数由大信号增益确立管长
+
+double L_from_smallGain(double targetGain);  //小信号增益确立管长

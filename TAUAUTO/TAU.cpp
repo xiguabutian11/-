@@ -351,6 +351,68 @@ double mag_judge(double fre, double pin, double voltage,double mag_A,double mag_
     }
 }
 
+double voltage_YOUHUA_Brief(double startV, double& start_voltage,
+    double& mag_A, double& mag_period)
+{
+    double F = 0;
+    double fre = (minfre + maxfre) / 2;
+    double I = DianLiu::way_1(Pout, V, miu);
+    BEST liu;
+    while (startV < V - Vcha || startV > V + Vcha)
+    {
+        if (startV < V - Vcha)
+        {
+            std::cout << "最佳电压低于目标范围" << std::endl;
+            if (F == 1) { V_change = V_change / 2; }
+            start_voltage = start_voltage + V_change;
+
+            LXjiegou jiegou = YOUHUA_sesan(minfre, maxfre, start_voltage, Pout, 0);//调整色散结构
+            double r = 1000 * jiegou.Ra;
+            datachange::beamDataChange("outerR", r / 2);
+            datachange::beamDataChange("tunnelR", r);
+            convertTxtToJson(outputPath, dispdatapath, minfre - 1, maxfre + 1);//传入色散数据
+
+            //--------------磁场优化------------
+            while (mag_judge(fre, 0.001 * mostpin, V, mag_A, mag_period) == 0)
+            {
+                mag_A += 0.01;
+                mag_period = mag2(V, r / 2, I);
+                datachange::mag(mag_A, mag_period);
+            }
+            mag_A = mag1(V, 0.5 * r, I, 1.8);
+            //----------------------------------
+            startV = liu.bestvoltage3(V, fre, I, Vjiange);//寻找最佳电压
+            F = -1;
+        }
+        else if (startV > V + Vcha)
+        {
+            std::cout << "最佳电压高于目标范围" << std::endl;
+            if (F == -1) { V_change = V_change / 2; }
+            start_voltage = start_voltage - V_change;
+
+            LXjiegou jiegou = YOUHUA_sesan(minfre, maxfre, start_voltage, Pout, 0);
+            double r = 1000 * jiegou.Ra;
+            datachange::beamDataChange("outerR", r / 2);
+            datachange::beamDataChange("tunnelR", r);
+
+            convertTxtToJson(outputPath, dispdatapath, minfre - 1, maxfre + 1);
+
+            //--------------磁场优化------------
+            while (mag_judge(fre, 0.001 * mostpin, V, mag_A, mag_period) == 0)
+            {
+                mag_A += 0.01;
+                mag_period = mag2(V, r / 2, I);
+                datachange::mag(mag_A, mag_period);
+            }
+            mag_A = mag1(V, 0.5 * r, I, 1.8);
+            //----------------------------------
+            startV = liu.bestvoltage3(V, fre, I, Vjiange);
+            F = 1;
+        }
+    }
+    return 1;
+};
+
 double voltage_YOUHUA(double bestV, double test_voltage,double length,double mag_A,double mag_period) {
     double F = 0;
     double r = 0;
@@ -413,4 +475,159 @@ double voltage_YOUHUA(double bestV, double test_voltage,double length,double mag
     }
     std::cout << "最佳电压处于范围内" << std::endl;
     return 1;
+}
+
+L_YOUHUA L_from_Gain(double Gain1,double m)
+{
+    L_YOUHUA liu1 = { 0,0,0,0 };
+    double length_enough = 0;          //用来判断管长是否足够满足全频段增益达到目标值
+    double test_pin = 0.1;
+    double test_length = 500;
+    double C = 0;
+    double A1 = 0.1;
+    double A2 = 0.1;
+    double D = 0;
+    double maxpout = 0;
+    while (length_enough == 0)
+    {
+        double now_Gain = 0;
+        double correspondingLength = 0;
+        double enough = 1;               //用来判断管子是否过饱和，0为过饱和，1为不饱和
+        std::cout << "============================================================== " << std::endl;
+        std::cout << "输入功率:" << test_pin << std::endl;
+        datachange::changecalsetting("pin", test_pin);
+        while (enough == 1)                //选择管长保证当前管子过饱和
+        {
+            datachange::tubeDataChange("tubeLength", test_length);
+
+            filesystem::path projectPath = Projectpath;
+            usrData& data = usrData::getInstance();
+
+            if (!projManage::openProj(projectPath.string())) {
+                for (auto& msg : data.curCalGroup.message) {
+                    std::cerr << msg.str << std::endl;
+                }
+                continue;
+            }
+            calculation::seqCalculate();
+            calculation::waitForAllTasks();
+
+            for (auto& seq : data.curCalGroup.res.reses) {
+
+                for (auto& res : seq.second) {
+                    if (!res.result.Pout.empty()) {
+
+                        auto& powerSequence = res.result.Pout[0];
+                        std::cout << "频率 " << res.freqy.freq << ": ";
+                        for (auto& out : powerSequence) {
+                            std::cout << out << " ";
+                        }
+                        auto maxIt = std::max_element(powerSequence.begin(), powerSequence.end());
+                        size_t maxIndex = std::distance(powerSequence.begin(), maxIt);
+                        size_t totalPoints = powerSequence.size();
+
+                        // 检查是否在终点
+                        if (maxIndex == totalPoints - 1) {
+                            now_Gain = 10 * log10(*maxIt / test_pin);
+                            enough = 1;
+                            test_length = test_length + 500;
+                        }
+                        else {
+                            now_Gain = 10 * log10(*maxIt / test_pin);
+                            correspondingLength = static_cast<double>(maxIndex) / totalPoints * test_length;
+                            maxpout = *maxIt;
+                            enough = 0;
+                        }
+                    }
+                }
+            }
+        }
+        if (Gain1 < now_Gain && now_Gain < Gain1 + m) { length_enough = 1; }
+        if (now_Gain < Gain1 && C != 2)
+        {
+            A2 = A2 / 2;
+            test_pin -= A2;
+            C = 1;
+        }
+        else if (now_Gain > Gain1 + m && C != 1)
+        {
+            if (D == 1) { A1 = A1 / 2; }
+            test_pin += A1;
+            C = 2;
+        }
+        else if (now_Gain < Gain1 && C == 2)
+        {
+            A1 = A1 / 2;
+            test_pin -= A1;
+            D = 1;
+        }
+        else if (now_Gain > Gain1 + m && C == 1)
+        {
+            A2 = A2 / 2;
+            test_pin += A2;
+        }
+        std::cout << "增益" << now_Gain << "对应管长" << correspondingLength << "最大输出功率" << maxpout << std::endl;
+        liu1.gain = now_Gain;
+		liu1.tubeLength = correspondingLength;
+		liu1.maxPout = maxpout;
+		liu1.optimalPin = test_pin;
+    };
+
+    return liu1;
+}
+
+
+double L_from_smallGain(double targetGain) {
+    std::cout << "寻找增益 " << targetGain << " dB 对应的位置" << std::endl;
+    std::cout << "输入功率: " << 0.01 << std::endl;
+
+    // 设置参数
+    datachange::changecalsetting("pin", 0.01);
+    datachange::tubeDataChange("tubeLength", 500);
+
+    // 执行计算
+    filesystem::path projectPath = Projectpath;
+    usrData& data = usrData::getInstance();
+
+    if (!projManage::openProj(projectPath.string())) {
+        for (auto& msg : data.curCalGroup.message) {
+            std::cerr << msg.str << std::endl;
+        }
+        return -1;
+    }
+
+    calculation::seqCalculate();
+    calculation::waitForAllTasks();
+
+    // 遍历结果，找到目标增益对应的位置
+    for (auto& seq : data.curCalGroup.res.reses) {
+        for (auto& res : seq.second) {
+            if (!res.result.Pout.empty()) {
+                auto& powerSequence = res.result.Pout[0];
+
+                std::cout << "频率 " << res.freqy.freq << " GHz 的功率序列: ";
+                for (size_t i = 0; i < powerSequence.size(); ++i) {
+                    double pout = powerSequence[i];
+                    double gain = 10 * log10(pout / 0.01);
+
+                    // 检查是否达到目标增益
+                    if (gain >= targetGain) {
+                        // 计算对应的位置管长
+                        double positionLength = static_cast<double>(i) / powerSequence.size() * 500;
+
+                        std::cout << "\n找到增益 " << gain << " dB 的位置:" << std::endl;
+                        std::cout << "输出功率: " << pout << " W" << std::endl;
+                        std::cout << "位置索引: " << i << "/" << powerSequence.size() << std::endl;
+                        std::cout << "对应管长: " << positionLength << " (总管长: " << 500 << ")" << std::endl;
+
+                        return positionLength;
+                    }
+                }
+                std::cout << std::endl;
+            }
+        }
+    }
+
+    std::cout << "警告：未找到增益 " << targetGain << " dB 的点！" << std::endl;
+    return -1;  // 未找到
 }
