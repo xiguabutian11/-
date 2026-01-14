@@ -169,7 +169,7 @@ SaturationResult best_pin1(double fre, double V, double initialPin, double L)
         totalPoints = powerInfo.totalPoints;
 
         int targetMin = totalPoints * 0.5 - 5;
-        int targetMax = totalPoints * 0.5 + 5;
+        int targetMax = totalPoints * 0.5 ;
 
         std::cout << "迭代 " << iteration + 1 << ": pin=" << currentPin << "W, "
             << "最大值点位置=" << currentMaxPoint << "/" << totalPoints
@@ -213,6 +213,7 @@ SaturationResult best_pin1(double fre, double V, double initialPin, double L)
                 currentPin = currentPin - step_down;
             }
             else {
+                step_down /= 2;
                 currentPin -= step_down;
             }
             newDirection = -1;

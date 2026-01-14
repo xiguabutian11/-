@@ -51,7 +51,7 @@ PowerResult HuZuoYong(double fre, double pin, double voltage);
 
 double smallpin(double guanzi_type, double L);   //返回小信号输入功率，同时更改了计算文件中的输入功率
 
-SaturationResult best_pin1(double fre, double V, double initialPin, double L);
+SaturationResult best_pin1(double fre, double V, double initialPin, double L);  //寻找固定管长下的饱和输入功率点
 
 double mag_judge(double fre, double pin, double voltage, double mag_A, double mag_period);
 

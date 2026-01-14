@@ -69,38 +69,57 @@ int main(){
 	datachange::changecalsetting("frequency", bestfre);
 	//==============找到最低限度的管长=================
 	L_YOUHUA LL = L_from_Gain(Gain,0.5);
-
+	datachange::tubeDataChange("tubeLength", LL.tubeLength);
+	//--------------三点磁场优化------------
+	while (mag_judge(fre, small_pin, V, mag_A, mag_period) == 0 ||
+		mag_judge(minfre, small_pin, V, mag_A, mag_period) == 0 ||
+		mag_judge(maxfre, small_pin, V, mag_A, mag_period) == 0)
+	{
+		mag_A += 0.01;
+		mag_period = mag2(V, r / 2, I);
+		datachange::mag(mag_A, mag_period);
+	}
+	mag_A = mag1(V, 0.5 * r, I, 1.8);
 	//--------------带宽优化---------------
+	SaturationResult NN_1 = best_pin1(fre, bestV, LL.optimalPin, LL.tubeLength);
+	SaturationResult NN_2 = best_pin1(minfre, bestV, LL.optimalPin, LL.tubeLength);
+	SaturationResult NN_3 = best_pin1(maxfre, bestV, LL.optimalPin, LL.tubeLength);
 
-//	double T = 0;
-//	while ( )
-//	{
-//		T = T + 2;
-//
-//		jiegou = YOUHUA_sesan(minfre, maxfre, test_voltage, Pout, T);
-//		r = 1000 * jiegou.Ra;
-//		datachange::beamDataChange("outerR", r / 2);
-//		datachange::beamDataChange("tunnelR", r);
-//
-//		convertTxtToJson(outputPath, dispdatapath, minfre - 1, maxfre + 1);
-//		//--------------管长优化---------------
-//	    
-//		//--------------三点磁场优化------------
-//		while (mag_judge(fre, small_pin, V, mag_A, mag_period) == 0||
-//		mag_judge(minfre, small_pin, V, mag_A, mag_period) == 0||
-//		mag_judge(maxfre, small_pin, V, mag_A, mag_period) == 0)
-//		{
-//			mag_A += 0.01;
-//			mag_period = mag2(V, r / 2, I);
-//			datachange::mag(mag_A, mag_period);
-//		}    
-//		mag_A = mag1(V, r1, I, 1.8);
-//		//----------------------------------
-//	}
-//	//---------添加一个增益检测----------
-//
-//
-//	//===================================
-//	std::cout << "管子设计结束" << std::endl;
-//
+	double T = 0;
+	while (NN_1.maxOutputPower < 400||
+		NN_2.maxOutputPower < 400 ||
+		NN_3.maxOutputPower < 400)
+	{
+		T = T + 2;
+
+		jiegou = YOUHUA_sesan(minfre, maxfre, test_voltage, Pout, T);
+		r = 1000 * jiegou.Ra;
+		datachange::beamDataChange("outerR", r / 2);
+		datachange::beamDataChange("tunnelR", r);
+
+		convertTxtToJson(outputPath, dispdatapath, minfre - 1, maxfre + 1);
+		//--------------管长优化---------------
+		LL = L_from_Gain(Gain, 0.5);
+		datachange::tubeDataChange("tubeLength", LL.tubeLength);
+		//--------------三点磁场优化------------
+		while (mag_judge(fre, small_pin, V, mag_A, mag_period) == 0||
+		mag_judge(minfre, small_pin, V, mag_A, mag_period) == 0||
+		mag_judge(maxfre, small_pin, V, mag_A, mag_period) == 0)
+		{
+			mag_A += 0.01;
+			mag_period = mag2(V, r / 2, I);
+			datachange::mag(mag_A, mag_period);
+		}    
+		mag_A = mag1(V, 0.5*r, I, 1.8);
+		//----------------------------------
+		NN_1 = best_pin1(fre, bestV, LL.optimalPin, LL.tubeLength);
+		NN_2 = best_pin1(minfre, bestV, LL.optimalPin, LL.tubeLength);
+		NN_3 = best_pin1(maxfre, bestV, LL.optimalPin, LL.tubeLength);
+	}
+	//---------添加一个增益检测----------
+
+
+	//===================================
+	std::cout << "管子设计结束" << std::endl;
+
   }
