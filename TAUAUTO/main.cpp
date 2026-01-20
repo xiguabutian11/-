@@ -85,7 +85,7 @@ int main(){
 	SaturationResult NN_2 = best_pin1(minfre, bestV, LL.optimalPin, LL.tubeLength);
 	SaturationResult NN_3 = best_pin1(maxfre, bestV, LL.optimalPin, LL.tubeLength);
 
-	double T = 0;
+	double T = 0;        //Î÷¹Ï²»Ìð
 	while (NN_1.maxOutputPower < Pout||
 		NN_2.maxOutputPower < Pout ||
 		NN_3.maxOutputPower < Pout)
