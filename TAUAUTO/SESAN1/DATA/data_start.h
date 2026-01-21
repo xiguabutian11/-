@@ -5,10 +5,10 @@
 static double com_fmin = 1; // 色散结构最小频率
 static double hf = 1; // 频率步进
 //-------------------------目标初始需求--------------------------
-static double minfre = 2;
-static double maxfre = 6;
-static double V = 12500;
-static double Pout = 400;
+static double minfre = 12;
+static double maxfre = 14;
+static double V = 10000;
+static double Pout = 300;
 static double Gain = 30;
 static double mostpin = Pout / pow(10, Gain / 10); // 达到目标的最大输入功率
 //-------------------------最佳电压扫描参数-----------------------

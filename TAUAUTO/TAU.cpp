@@ -154,8 +154,8 @@ SaturationResult best_pin1(double fre, double V, double initialPin, double L)
 {
     datachange::tubeDataChange("tubeLength", 2 * L);
     double currentPin = initialPin;
-    double step_up = initialPin * 0.5;
-    double step_down = initialPin * 0.5;
+    double step_up = initialPin ;
+    double step_down = initialPin ;
     const int maxIterations = 50;  //最大迭代次数
 
     std::cout << "=== 寻找最佳输入功率 ===" << std::endl;
@@ -168,8 +168,9 @@ SaturationResult best_pin1(double fre, double V, double initialPin, double L)
         int currentMaxPoint = powerInfo.maxPowerPoint;
         totalPoints = powerInfo.totalPoints;
 
-        int targetMin = totalPoints * 0.5 - 5;
-        int targetMax = totalPoints * 0.5 ;
+        // 使用整数运算避免从 double 到 int 的隐式转换警告
+        int targetMin = (totalPoints / 2) - 5;
+        int targetMax = (totalPoints / 2) ;
 
         std::cout << "迭代 " << iteration + 1 << ": pin=" << currentPin << "W, "
             << "最大值点位置=" << currentMaxPoint << "/" << totalPoints
@@ -177,7 +178,7 @@ SaturationResult best_pin1(double fre, double V, double initialPin, double L)
 
         // 检查是否在目标区间内
         if (currentMaxPoint >= targetMin && currentMaxPoint <= targetMax) {
-            std::cout << " ✓ 符合要求" << std::endl;
+            std::cout << " 符合要求" << std::endl;
 
             double oversaturation = 0;
             if (powerInfo.maxOutputPower > powerInfo.endOutputPower) {
@@ -196,27 +197,25 @@ SaturationResult best_pin1(double fre, double V, double initialPin, double L)
         if (currentMaxPoint > targetMax) {
             std::cout << " → 最大值在末端，增大功率" << std::endl;
             if (lastDirection == -1) { // 方向改变
-                step_up /= 2;
-                std::cout << "  增长步长减半: " << step_up << "W" << std::endl;
-                currentPin = currentPin + step_up; // Corrected: Add step_up
+                step_down /= 2;
+                currentPin = currentPin + step_down;
             }
             else {
                 currentPin += step_up;
+                newDirection = 1;
             }
-            newDirection = 1;
         }
         else if (currentMaxPoint < targetMin) {
             std::cout << " → 最大值点太靠前，减小功率" << std::endl;
             if (lastDirection == 1) { // 方向改变
-                step_down /= 2;
-                std::cout << "  减少步长减半: " << step_down << "W" << std::endl;
-                currentPin = currentPin - step_down;
+                step_up /= 2;
+                currentPin = currentPin - step_up; // Corrected: Add step_up
             }
             else {
                 step_down /= 2;
                 currentPin -= step_down;
+                newDirection = -1;
             }
-            newDirection = -1;
         }
 
         lastDirection = newDirection;

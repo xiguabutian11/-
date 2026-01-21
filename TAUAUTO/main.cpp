@@ -70,7 +70,7 @@ int main(){
 	//==============找到最低限度的管长=================
 	L_YOUHUA LL = L_from_Gain(Gain,0.5);
 	datachange::tubeDataChange("tubeLength", LL.tubeLength);
-	//--------------三点磁场优化------------
+	//--------------三点磁场优化------------感觉磁场优化应该在改变完管长就该调整了，不该管长变完再调整磁场
 	while (mag_judge(fre, small_pin, V, mag_A, mag_period) == 0 ||
 		mag_judge(minfre, small_pin, V, mag_A, mag_period) == 0 ||
 		mag_judge(maxfre, small_pin, V, mag_A, mag_period) == 0)
@@ -85,10 +85,10 @@ int main(){
 	SaturationResult NN_2 = best_pin1(minfre, bestV, LL.optimalPin, LL.tubeLength);
 	SaturationResult NN_3 = best_pin1(maxfre, bestV, LL.optimalPin, LL.tubeLength);
 
-	double T = 0;        //西瓜不甜
+	double T = 0;        
 	while (NN_1.maxOutputPower < Pout||
 		NN_2.maxOutputPower < Pout ||
-		NN_3.maxOutputPower < Pout)
+		NN_3.maxOutputPower < Pout)            //这个环节可能不完善
 	{
 		T = T + 2;
 
@@ -98,6 +98,9 @@ int main(){
 		datachange::beamDataChange("tunnelR", r);
 
 		convertTxtToJson(outputPath, dispdatapath, minfre - 1, maxfre + 1);
+		//================对多个频点进行比较================
+		double bestfre = liu.bestfre();
+		datachange::changecalsetting("frequency", bestfre);
 		//--------------管长优化---------------
 		LL = L_from_Gain(Gain, 0.5);
 		datachange::tubeDataChange("tubeLength", LL.tubeLength);
@@ -117,7 +120,9 @@ int main(){
 		NN_3 = best_pin1(maxfre, bestV, LL.optimalPin, LL.tubeLength);
 	}
 	//---------添加一个增益检测----------
-
+	std::cout << "工作频率" << minfre << "增益为" << 10 * log10(NN_2.endOutputPower / NN_2.optimalPin) << std::endl;
+	std::cout << "工作频率" << fre << "增益为" << 10 * log10(NN_1.endOutputPower / NN_1.optimalPin) << std::endl;
+	std::cout << "工作频率" << maxfre << "增益为" << 10 * log10(NN_3.endOutputPower / NN_3.optimalPin) << std::endl;
 
 	//===================================
 	std::cout << "管子设计结束" << std::endl;
