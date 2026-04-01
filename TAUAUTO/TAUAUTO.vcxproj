@@ -39,7 +39,6 @@
     <ClCompile Include="NEW\gongshi.cpp" />
     <ClCompile Include="NEW\tube_length.cpp" />
     <ClCompile Include="SESAN1\SESAN\data_get\SeSan_get.cpp" />
-    <ClCompile Include="SESAN1\SESAN\exe\jisuan\Jisuan.cpp" />
     <ClCompile Include="SESAN1\SESAN\jisuan\Jisuan.cpp" />
     <ClCompile Include="SESAN1\SESAN\judgeANDchange\change_units.cpp" />
     <ClCompile Include="SESAN1\SESAN\judgeANDchange\judge.cpp" />
@@ -92,7 +91,6 @@
     <ClInclude Include="resultProcess\resultPro.h" />
     <ClInclude Include="SESAN1\DATA\data_start.h" />
     <ClInclude Include="SESAN1\SESAN\data_get\SeSan_get.h" />
-    <ClInclude Include="SESAN1\SESAN\exe\jisuan\Jisuan.h" />
     <ClInclude Include="SESAN1\SESAN\jisuan\Jisuan.h" />
     <ClInclude Include="SESAN1\SESAN\judgeANDchange\change_units.h" />
     <ClInclude Include="SESAN1\SESAN\judgeANDchange\judge.h" />
@@ -120,6 +118,9 @@
     <ClInclude Include="usrDataInfo\usrData.h" />
     <ClInclude Include="usrDataInfo\usrDataCheck.h" />
     <ClInclude Include="usrDataInfo\usrDataSet.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="SESAN1\SESAN\plot.py" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

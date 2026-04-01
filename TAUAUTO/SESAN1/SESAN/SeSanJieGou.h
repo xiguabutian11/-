@@ -11,7 +11,7 @@
 #pragma once
 
 void convertTxtToJson(const std::string& inputFile, const std::string& outputFile,
-    double minfre, double maxfre);
+    double minfre, double maxfre, jieduan LL);
 
 std::tuple <LXjiegou, LXsesan>  youhua_way1(LXjiegou jiegou, LXsesan target, std::vector<LXsesan> n_guanzi);
 

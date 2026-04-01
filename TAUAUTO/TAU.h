@@ -18,17 +18,28 @@
 #include <unordered_map>
 #include <iostream>
 #include"DATA/data_start.h"
-
 #include"SeSanJieGou.h"
 #include"NEW/tube_length.h"
 #include"NEW/gongshi.h"
 #include"cal_change/find_voltage.h"
 
+
 struct PowerResult {
-    double maxOutputPower;      // 最大输出功率
-    int maxPowerPoint;          // 最大功率对应的点数
-    double endOutputPower;      // 末端输出功率  
-    int totalPoints;            // 总点数
+    double midOutputPower;       // 中点输出功率
+    double endOutputPower;       // 末端输出功率
+    int totalPoints;             // 总点数
+
+    // 带阈值的极大值
+    double targetPeakPower;      // 第一个符合阈值的极大值功率
+    int targetPeakPoint;         // 第一个符合阈值的极大值点位置（1开始）
+
+    // 全局最大值
+    double globalMaxPower;       // 全局最大值功率
+    int globalMaxPoint;          // 全局最大值点位置（1开始）
+
+    // 新增：两点间极小值
+    double valleyPower;          // 极小值大小
+    int valleyPoint;             // 极小值位置（1开始）
 };
 
 struct SaturationResult {
@@ -36,6 +47,7 @@ struct SaturationResult {
     double maxOutputPower;      // 最大输出功率
     double endOutputPower;      // 末端输出功率  
     double oversaturation;      // 过饱和程度 (0-1)
+	double workfre;             // 工作频率
     int maxPowerPoint;          // 最大功率点位置
     int iterations;             // 迭代次数
 };
@@ -47,7 +59,10 @@ struct L_YOUHUA {
     double optimalPin;     // 最优输入功率
 };
 
+
 PowerResult HuZuoYong(double fre, double pin, double voltage);
+
+int pout_yes(double fre, double pin, double voltage);
 
 double smallpin(double guanzi_type, double L);   //返回小信号输入功率，同时更改了计算文件中的输入功率
 
@@ -55,10 +70,21 @@ SaturationResult best_pin1(double fre, double V, double initialPin, double L);  
 
 double mag_judge(double fre, double pin, double voltage, double mag_A, double mag_period);
 
-double voltage_YOUHUA_Brief(double startV, double& start_voltage,double& mag_A, double& mag_period);
+LXjiegou voltage_YOUHUA_Brief(double startV, double& start_voltage,double& mag_A, double& mag_period);
 
-double voltage_YOUHUA(double bestV, double test_voltage, double length, double mag_A, double mag_period);
+LXjiegou voltage_YOUHUA(double bestV, double test_voltage, double length, double mag_A, double mag_period);
 
-L_YOUHUA L_from_Gain(double Gain1, double m);   //Gain1为目标增益，m为精度大小，该函数由大信号增益确立管长
+L_YOUHUA L_from_Gain(double Gain1, double m, double L);   //Gain1为目标增益，m为精度大小，该函数由大信号增益确立管长
 
-double L_from_smallGain(double targetGain);  //小信号增益确立管长
+double L_from_smallGain(double targetGain, double L);  //小信号增益确立管长
+
+void writeDataToFile(const std::string& filename,LXjiegou jiegou,double L, jieduan LL,
+    SaturationResult NN_1,
+    SaturationResult NN_2,
+    SaturationResult NN_3,
+    SaturationResult NN_21,
+    SaturationResult NN_22,
+    SaturationResult NN_23,
+    SaturationResult NN_11,
+    SaturationResult NN_12,
+    SaturationResult NN_13);

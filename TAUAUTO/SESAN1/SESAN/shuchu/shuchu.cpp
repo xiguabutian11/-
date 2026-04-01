@@ -40,7 +40,8 @@ void shuchu::A4(LXsesan guanzi)
 
 void shuchu::A5(order order)
 {
-	std::cout << "判断参数" << order.n << "  " << order.t << "  " << order.m << "  " <<order.p << "  " << std::endl;
+	std::cout << "判断参数:" << std::endl;
+	std::cout <<"频率：" << order.n << "  相速差：" << order.t << "  相速：" << order.m << "  阻抗：" << order.p << "  " << std::endl;
 };
 
 void shuchu::A6(LXjiegou jiegou,LXsesan centervalue,LXjiegou youhua_jiegou,LXsesan youhua_centervalue)
@@ -52,3 +53,5 @@ void shuchu::A6(LXjiegou jiegou,LXsesan centervalue,LXjiegou youhua_jiegou,LXses
 	std::cout << " Ra:" << youhua_jiegou.Ra * 1e3 << " Rb:" << youhua_jiegou.Rb * 1e3 << " Rc:" << youhua_jiegou.Rc * 1e3 << " Rg:" << youhua_jiegou.Rg * 1e3 << " L:" << youhua_jiegou.L * 1e3 << " del:" << youhua_jiegou.del * 1e3 << std::endl;
 	std::cout << " f:" << youhua_centervalue.f_end << " vp:" << youhua_centervalue.vp << " kc:" << youhua_centervalue.kc << std::endl;
 };
+
+

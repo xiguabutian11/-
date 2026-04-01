@@ -177,10 +177,16 @@
     <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="SESAN1\SESAN\data_get\SeSan_get.cpp">
+    <ClCompile Include="cal_change\find_voltage.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="SESAN1\SESAN\exe\jisuan\Jisuan.cpp">
+    <ClCompile Include="NEW\tube_length.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="NEW\gongshi.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="SESAN1\SESAN\data_get\SeSan_get.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="SESAN1\SESAN\jisuan\Jisuan.cpp">
@@ -190,6 +196,15 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="SESAN1\SESAN\judgeANDchange\judge.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="SESAN1\SESAN\sesanjiegou\constpar.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="SESAN1\SESAN\sesanjiegou\sesan.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="SESAN1\SESAN\sesanjiegou\TauEigen.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="SESAN1\SESAN\shuchu\shuchu.cpp">
@@ -211,24 +226,6 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="SESAN1\SESAN\SeSanJieGou.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="SESAN1\SESAN\sesanjiegou\constpar.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="SESAN1\SESAN\sesanjiegou\sesan.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="SESAN1\SESAN\sesanjiegou\TauEigen.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="cal_change\find_voltage.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="NEW\tube_length.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="NEW\gongshi.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -332,13 +329,19 @@
     <ClInclude Include="TAU.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="cal_change\find_voltage.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="NEW\tube_length.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="NEW\gongshi.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
     <ClInclude Include="SESAN1\DATA\data_start.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="SESAN1\SESAN\data_get\SeSan_get.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="SESAN1\SESAN\exe\jisuan\Jisuan.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="SESAN1\SESAN\jisuan\Jisuan.h">
@@ -351,6 +354,18 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="SESAN1\SESAN\parameter\parameter.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="SESAN1\SESAN\sesanjiegou\constpar.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="SESAN1\SESAN\sesanjiegou\params.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="SESAN1\SESAN\sesanjiegou\sesan.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="SESAN1\SESAN\sesanjiegou\TauEigen.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="SESAN1\SESAN\shuchu\shuchu.h">
@@ -371,26 +386,8 @@
     <ClInclude Include="SESAN1\SESAN\SeSanJieGou.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="SESAN1\SESAN\sesanjiegou\constpar.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="SESAN1\SESAN\sesanjiegou\params.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="SESAN1\SESAN\sesanjiegou\TauEigen.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="SESAN1\SESAN\sesanjiegou\sesan.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="cal_change\find_voltage.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="NEW\tube_length.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="NEW\gongshi.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="SESAN1\SESAN\plot.py" />
   </ItemGroup>
 </Project>

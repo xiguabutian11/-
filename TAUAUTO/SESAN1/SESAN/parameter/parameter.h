@@ -54,3 +54,10 @@ struct order {
     double j=0;        //µçÁ÷ÃÜ¶ÈÅĞ¶Ï
 };
 
+struct jieduan
+{
+    double A;
+    double B;
+    double C;
+    double D;
+};

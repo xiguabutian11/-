@@ -4,6 +4,10 @@ static LXjiegou all_change(LXjiegou jiegou, double k)  //ÕûÌå³ß´çµÄµ÷Õû£¬¶ÔÓ¦¹¤×
 {
 	jiegou.Ra = jiegou.Ra * k;
 	jiegou.Rb = jiegou.Rb * k;
+	if(jiegou.Rb- jiegou.Ra<= 0.0001){
+		std::cout << "ÂİĞıÏßºñ¶ÈĞ¡ÓÚ0.1mm,¹Ì¶¨Îª0.1mm";
+		jiegou.Rb = jiegou.Ra + 0.0001001;
+	}
 	jiegou.Rc = jiegou.Rc * k;
 	jiegou.Rg = jiegou.Rg * k;
 	jiegou.L = jiegou.L * k;

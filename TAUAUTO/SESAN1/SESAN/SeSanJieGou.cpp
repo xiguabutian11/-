@@ -1,7 +1,7 @@
 #include "SeSanJieGou.h"
 
 void convertTxtToJson(const std::string& inputFile, const std::string& outputFile,
-    double minfre, double maxfre) {
+    double minfre, double maxfre, jieduan LL) {
     std::ifstream infile(inputFile);
     std::string line;
     std::vector<double> freq;
@@ -74,9 +74,16 @@ void convertTxtToJson(const std::string& inputFile, const std::string& outputFil
     outfile << "    }\n";
     outfile << "  ],\n";
     outfile << "  \"samplePoints\": [\n";
+    if (LL.B == 0) {
+        outfile << "    {\"dispKey\": \"position_1\", \"interpoType\": 0, \"point\": 0.0},\n";
+        outfile << "    {\"dispKey\": \"position_1\", \"interpoType\": 0, \"point\": 1},\n";
+        outfile << "    {\"dispKey\": \"position_1\", \"interpoType\": 0, \"point\": 2}\n";
+    }
+    else if (LL.B!=0){
     outfile << "    {\"dispKey\": \"position_1\", \"interpoType\": 0, \"point\": 0.0},\n";
-    outfile << "    {\"dispKey\": \"position_1\", \"interpoType\": 1, \"point\": 27.90},\n";
-    outfile << "    {\"dispKey\": \"position_1\", \"interpoType\": 0, \"point\": 28.83}\n";
+    outfile << "    {\"dispKey\": \"position_1\", \"interpoType\": 1, \"point\": " << LL.B << "},\n";
+    outfile << "    {\"dispKey\": \"position_1\", \"interpoType\": 0, \"point\": " << LL.C << "}\n";
+    }
     outfile << "  ]\n";
     outfile << "}\n";
     outfile.close();
@@ -100,7 +107,7 @@ std::tuple <LXjiegou, LXsesan>  youhua_way1(LXjiegou jiegou, LXsesan target, std
 	shuchu::A4(centervalue);
 	shuchu::A5(order1);
 
-	while (!(order1.n == 0 && order1.m == 0 && order1.p == 0&&order1.t==0) && time <= 100&&order1.j!=1)
+	while (!(order1.n == 0 && order1.m == 0 && order1.p == 0&&order1.t==0) && time <= 100)
 	{
 		
 		std::tuple<LXjiegou, order,double>fre_youhua = fre_youhua::way_1(target, jiegou, order1, time);
@@ -136,7 +143,23 @@ LXjiegou YOUHUA_sesan(double minfre, double maxfre, double V, double Pout,double
 	LXsesan target = SeSanMuBiao(minfre, maxfre, V, Pout,N);
 	//根据用户给出的频带，电压，饱和输出功率，计算出色散结构所需要达到的目标值
 	LXjiegou jiegou = SeSanJieGou(target);
-	// 根据目标获得色散几何结构的可能值，将几何几何结构数值存入input.txt	
+	// 根据目标获得色散几何结构的可能值，将几何几何结构数值存入input.txt
+    double Current_density = target.I / (PI * m_cm(jiegou.Ra) * m_cm(jiegou.Ra));
+    if (target.kc > 30) {
+        target.kc = 30 + N;
+        target.I = DianLiu::way_2(Pout, V, target.kc);
+        Current_density = target.I / (PI * m_cm(jiegou.Ra) * m_cm(jiegou.Ra));
+        if (Current_density > 80)
+        {
+            target.I = 70.0 * PI * m_cm(jiegou.Ra) * m_cm(jiegou.Ra);
+            target.kc = ZuKang::way_1(V, target.I, Pout, N);
+        }
+    }
+    else if (Current_density > 80){
+        target.I = 70.0 * PI * m_cm(jiegou.Ra) * m_cm(jiegou.Ra);
+        target.kc = ZuKang::way_1(V, target.I, Pout, N);
+    }
+    shuchu::A2(target.vp, target.I, target.kc, jiegou.Ra, jiegou.Rb, jiegou.Rc, jiegou.Rg, jiegou.L, jiegou.del);
 	sesan();
 	//通过input.txt的数据，计算出色散数据存放在output.txt中
 	std::vector<LXsesan>guanzi = readTWTData("output.txt");

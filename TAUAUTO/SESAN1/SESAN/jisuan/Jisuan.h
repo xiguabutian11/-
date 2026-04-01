@@ -16,6 +16,7 @@ public:
 class DianLiu
 {public:
     static double way_1(double Pmax, double voltage,double miu);
+    static double way_2(double Pmax, double voltage, double Kc);
 };
 
 class ZuKang

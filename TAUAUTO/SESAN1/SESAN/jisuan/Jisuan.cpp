@@ -17,12 +17,20 @@ double DianLiu::way_1(double Pmax, double voltage,double miu)
     double current = Pmax /( miu * voltage);
     return  current;
 }
-double ZuKang::way_1(double voltage, double current, double Pmax,double M)
+double DianLiu::way_2(double Pmax, double voltage, double Kc)
 {
-    double P = std::pow(Pmax, 3);
-    double A = 1 + 0.01 * std::pow(current, 4) + 1E-15 * std::pow(voltage, 2.5);
-    double B = std::pow(PI, 2) * std::pow(voltage, 2) * std::pow(current, 4) - P * 0.01;
-    double Kc = P * A / B+M;
+    double numerator = std::pow(Pmax, 3);
+    double denominator = std::pow(PI, 2) * std::pow(voltage, 2) * Kc;
+    double I4 = numerator / denominator;
+    double I = std::pow(I4, 0.25);
+    return I;
+
+}
+double ZuKang::way_1(double voltage, double current, double Pmax, double M)
+{
+    double A = std::pow(Pmax, 3);
+    double B = std::pow(PI, 2) * std::pow(voltage, 2) * std::pow(current, 4);
+    double Kc = A / B + M;
     return Kc;
 }
 
@@ -35,6 +43,9 @@ LXjiegou YuShe_jiegou::way_1(double fre, double vp)
     guodu_jiegou.Ra = ra;                  //螺旋线内半径                       
     //*********************按照螺旋线内半径的一定比例预设其它尺寸************************
     guodu_jiegou.Rb = 1.3 * ra;            //螺旋线外半径
+    if (guodu_jiegou.Rb - guodu_jiegou.Ra < 0.0001) { std::cout << "螺旋线厚度小于0.1mm,固定为0.1mm";
+    guodu_jiegou.Rb = guodu_jiegou.Ra + 0.0001001;
+    }
     guodu_jiegou.Rc = 3.5 * ra;            //屏蔽壳内半径
     guodu_jiegou.Rg = 3.5 * ra;            //无翼片
 	guodu_jiegou.fir = first_fir;                 //线距

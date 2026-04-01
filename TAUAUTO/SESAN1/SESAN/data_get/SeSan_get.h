@@ -6,10 +6,17 @@
 #include"parameter/parameter.h"
 #include <cmath> 
 
+struct VpRangeResult {
+    int status;    // 状态值: 1-最大值在左端点, 2-最大值在中间, 3-最大值在右端点
+    double value;  // 计算得到的差值
+    double max_vp;
+    double min_vp;
+};
+
 //**********************从所有相位角的色散数据中提取需要数据**********************
 
 LXsesan centerfre(std::vector<LXsesan>guanzi, double f_phi);               //提取目标相速角的色散数据
 
 LXsesan fre_data(std::vector<LXsesan>guanzi, double fre);             //提取目标频率的色散数据
 
-double Vp_range(std::vector<LXsesan>guanzi, double minfre, double maxfre);//提取频段相速差
+VpRangeResult Vp_range(std::vector<LXsesan> guanzi, double minfre, double maxfre);//提取频段相速差

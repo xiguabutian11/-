@@ -5,8 +5,10 @@ using namespace std;
 
 
 
-PowerResult HuZuoYong(double fre, double pin, double voltage) {
-    PowerResult result{ 0, 0, 0, 0 };
+PowerResult HuZuoYong(double fre, double pin, double voltage)
+{
+    // 结构体初始化对应更新后的字段
+    PowerResult result{ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
     std::cout << "Setting fre to: " << fre << std::endl;
     datachange::changecalsetting("frequency", fre);
@@ -43,16 +45,105 @@ PowerResult HuZuoYong(double fre, double pin, double voltage) {
                 result.totalPoints = poutArray.size();
 
                 if (result.totalPoints > 0) {
-                    // 找到最大输出功率及其位置
-                    auto maxIt = std::max_element(poutArray.begin(), poutArray.end());
-                    result.maxOutputPower = *maxIt;
-                    result.maxPowerPoint = std::distance(poutArray.begin(), maxIt) + 1; // 从1开始计数
+                   // ========== 1. 查找第一个超过阈值的极大值点 ==========
+                    const double threshold = 0.5 * Pout;
+                    int targetPeakPointIdx = -1; // 0开始
+                    double targetPeakPower = 0.0;
 
-                    // 获取末端输出功率（最后一个点）
+                    // 遍历找第一个符合条件的极大值点
+                    for (int i = 0; i < result.totalPoints; i++) {
+                        bool isPeak = false;
+                        double currentPower = poutArray[i];
+
+                        if (i > 0 && i < result.totalPoints - 1) {
+                            // 核心修改：左侧> 右侧>=，同时加后续趋势校验
+                            bool basicPeak = (currentPower > poutArray[i - 1]) && (currentPower >= poutArray[i + 1]);
+                            if (basicPeak) {
+                                // 额外校验：如果右侧是相等的平缓点，需检查平缓后是否爬升
+                                int j = i + 1;
+                                // 跳过连续相等的平缓点
+                                while (j < result.totalPoints && poutArray[j] == currentPower) {
+                                    j++;
+                                }
+                                // 若平缓后继续爬升 → 不是极大值；若平缓后下降/到末尾 → 是极大值
+                                if (j >= result.totalPoints || poutArray[j] < currentPower) {
+                                    isPeak = true;
+                                }
+                            }
+                        }
+                        // 最后一个点：左侧> （原有逻辑，无需改）
+                        else if (i == result.totalPoints - 1 && result.totalPoints > 1) {
+                            isPeak = (currentPower > poutArray[i - 1]);
+                        }
+                        // 只有1个点：默认是极大值
+                        else if (result.totalPoints == 1) {
+                            isPeak = true;
+                        }
+
+                        // 找到第一个符合阈值的极大值点，立即停止遍历
+                        if (isPeak && currentPower > threshold) {
+                            targetPeakPointIdx = i;
+                            targetPeakPower = currentPower;
+                            break;
+                        }
+                    }
+
+                    // 兼容逻辑：没找到符合条件的极大值点，降级使用原最大值逻辑
+                    if (targetPeakPointIdx == -1) {
+                        auto maxIt = std::max_element(poutArray.begin(), poutArray.end());
+                        targetPeakPower = *maxIt;
+                        targetPeakPointIdx = std::distance(poutArray.begin(), maxIt);
+                    }
+
+                    // ========== 2. 提取全局最大值（原有逻辑） ==========
+                    auto globalMaxIt = std::max_element(poutArray.begin(), poutArray.end());
+                    double globalMaxPower = *globalMaxIt;
+                    int globalMaxPointIdx = std::distance(poutArray.begin(), globalMaxIt); // 0开始
+
+                    // ========== 3. 新增：提取两点之间的极小值 ==========
+                    double valleyPower = 0.0;    // 极小值大小
+                    int valleyPointIdx = -1;     // 极小值位置（0开始）
+
+                    // 判断：全局最大值点和极大值点不是同一个点
+                    if (globalMaxPointIdx != targetPeakPointIdx) {
+                        // 确定两点之间的区间（取最小索引为起点，最大索引为终点）
+                        int startIdx = std::min(globalMaxPointIdx, targetPeakPointIdx);
+                        int endIdx = std::max(globalMaxPointIdx, targetPeakPointIdx);
+
+                        // 查找区间内的最小值（极小值）
+                        auto valleyIt = std::min_element(poutArray.begin() + startIdx, poutArray.begin() + endIdx + 1);
+                        valleyPower = *valleyIt;
+                        valleyPointIdx = std::distance(poutArray.begin(), valleyIt); 
+                    }
+                    else {
+                        // 两点相同，极小值赋值为0
+                        valleyPower = 0.0;
+                        valleyPointIdx = -1;
+                    }
+
+                    // ========== 4. 赋值所有字段 ==========
+                    // 原有目标极大值（带阈值）
+                    result.targetPeakPower = targetPeakPower;
+                    result.targetPeakPoint = targetPeakPointIdx + 1; // 转1开始
+                    // 全局最大值
+                    result.globalMaxPower = globalMaxPower;
+                    result.globalMaxPoint = globalMaxPointIdx + 1; // 转1开始
+                    // 新增极小值字段
+                    result.valleyPower = valleyPower;
+                    result.valleyPoint = valleyPointIdx + 1; // 转1开始（-1则为0）
+                    // 原有其他字段
+                    int midPoint = result.totalPoints / 2;
+                    result.midOutputPower = poutArray[midPoint];
                     result.endOutputPower = poutArray.back();
 
+                    // ========== 调试输出 ==========
                     std::cout << "总点数: " << result.totalPoints << std::endl;
-                    std::cout << "最大输出功率: " << result.maxOutputPower << " W (第" << result.maxPowerPoint << "点)" << std::endl;
+                    std::cout << "第一个符合阈值的极大值: " << targetPeakPower << " W (第" << result.targetPeakPoint << "点)" << std::endl;
+                    std::cout << "全局最大值: " << globalMaxPower << " W (第" << result.globalMaxPoint << "点)" << std::endl;
+                    if (valleyPointIdx != -1) {
+                        std::cout << "两点间极小值: " << valleyPower << " W (第" << result.valleyPoint << "点)" << std::endl;
+                    }
+                    std::cout << "中点输出功率: " << result.midOutputPower << " W (第" << midPoint + 1 << "点)" << std::endl;
                     std::cout << "末端输出功率: " << result.endOutputPower << " W (第" << result.totalPoints << "点)" << std::endl;
                 }
             }
@@ -62,12 +153,51 @@ PowerResult HuZuoYong(double fre, double pin, double voltage) {
     return result;
 }
 
+int pout_yes(double fre, double pin, double voltage)
+{
+    // 1. 设置参数（触发计算的必要步骤）
+    datachange::changecalsetting("frequency", fre);
+    datachange::changecalsetting("pin", pin);
+    datachange::changecalsetting("v1", voltage);
 
+    // 2. 打开项目并执行计算
+    filesystem::path projectPath = Projectpath;
+    usrData& data = usrData::getInstance();
+    if (!projManage::openProj(projectPath.string())) {
+        for (auto& msg : data.curCalGroup.message) {
+            std::cerr << msg.str << std::endl;
+        }
+    }// 忽略返回值，仅执行
+    calculation::seqCalculate();
+    calculation::waitForAllTasks();
+
+    // 3. 核心判断：res中是否有有效数值
+    bool hasValidValue = false;
+    for (auto& seq : data.curCalGroup.res.reses) {
+        for (auto& res : seq.second) {
+            // 检查Pout是否非空，且至少有一个非0数值
+            if (!res.result.Pout.empty()) {
+                for (auto& pout : res.result.Pout[0]) {
+                    if (pout != 0.0) { // 判定有效数值：非0
+                        hasValidValue = true;
+                        break; // 找到有效数值，终止内层循环
+                    }
+                }
+                if (hasValidValue) break; // 终止中层循环
+            }
+        }
+        if (hasValidValue) break; // 终止外层循环
+    }
+
+    // 4. 返回结果：有有效数值返回1，否则返回0
+    return hasValidValue ? 1 : 0;
+}
 
 double smallpin(double guanzi_type, double L)
 {
     double A = 0;
     double pin = 0.1;
+    const double MIN_PIN_LIMIT = 1e-5; // 功率下限阈值10^-5 W
     datachange::tubeDataChange("tubeLength", 2 * L);
 
     while (A == 0) {
@@ -134,15 +264,29 @@ double smallpin(double guanzi_type, double L)
             std::cout << ", 管子类型2取第二个极值点, 位置=" << MAXPOINT;
         }
 
-        double Lbaohe = (MAXPOINT * 2.0 * L) / totalPoints;
-        std::cout << ", L=" << L << ", Lbaohe=" << Lbaohe << std::endl;
+        double Lbaohe = (MAXPOINT * 2.0 * L) / totalPoints; // L1：功率最大值位置的管长
+        std::cout << ", L=" << L << ", Lbaohe(功率最大值管长)=" << Lbaohe << std::endl;
 
-        if ( L < 0.7 * Lbaohe) {
+        // 核心逻辑修改：修正记录管长的计算
+        if (L < 0.7 * Lbaohe) {
+            // 满足条件：正常返回，更新为原始L
             A = 1;
             datachange::tubeDataChange("tubeLength", L);
             return pin;
         }
-        else  {
+        else if (pin <= MIN_PIN_LIMIT+ 1e-6) {
+            // 功率降至10^-5仍不满足条件，记录0.7*Lbaohe并更新
+            double record_tube_length = 0.7 * Lbaohe; // 要记录的管长：0.7*功率最大值位置的管长
+            std::cout << "警告：功率已降至" << MIN_PIN_LIMIT << "W，仍未满足条件！" << std::endl;
+            std::cout << "当前记录 - 功率最大值位置管长(L1)：" << Lbaohe
+                << "，最终记录管长(0.7*L1)：" << record_tube_length
+                << "，输入功率：" << pin << std::endl;
+            A = 1; // 终止循环
+            datachange::tubeDataChange("tubeLength", record_tube_length); // 更新为0.7*L1
+            return pin; // 返回当前功率
+        }
+        else {
+            // 未满足条件且功率未到下限，继续缩小
             pin = 0.1 * pin;
         }
     }
@@ -152,52 +296,114 @@ double smallpin(double guanzi_type, double L)
 
 SaturationResult best_pin1(double fre, double V, double initialPin, double L)
 {
+    double Gainmax = 25;
+    if (Gain > 20 && Gain < 45) { Gainmax = 50; }
+    else if (Gain < 70) { Gainmax = 75; }
+    // 这里你原来的代码 >=70 没处理，我帮你加上安全判断
+    else if (Gain >= 70) {
+        std::cerr << "错误：增益过大 >=70dB，程序终止！" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
     datachange::tubeDataChange("tubeLength", 2 * L);
     double currentPin = initialPin;
-    double step_up = initialPin ;
-    double step_down = initialPin ;
-    const int maxIterations = 50;  //最大迭代次数
+    double step_up = initialPin;
+    double step_down = initialPin;
+    const int maxIterations = 50;
 
     std::cout << "=== 寻找最佳输入功率 ===" << std::endl;
 
-    int lastDirection = 0; // 改用lastDirection记录方向
+    int lastDirection = 0;
     int totalPoints = 0;
 
     for (int iteration = 0; iteration < maxIterations; iteration++) {
         PowerResult powerInfo = HuZuoYong(fre, currentPin, V);
-        int currentMaxPoint = powerInfo.maxPowerPoint;
+        int currentMaxPoint = powerInfo.targetPeakPoint;
         totalPoints = powerInfo.totalPoints;
 
-        // 使用整数运算避免从 double 到 int 的隐式转换警告
-        int targetMin = (totalPoints / 2) - 5;
-        int targetMax = (totalPoints / 2) ;
+        // ===================== 【新增：增益超限判断】 =====================
+        // 计算当前增益：全局最大输出功率 / 当前输入功率
+        double currentGain = 10 * log10(powerInfo.globalMaxPower / currentPin);
+
+        bool isDecreasing = (lastDirection == -1);  // 正在减小功率
+        if (isDecreasing && currentGain > Gainmax)
+        {
+            std::cout << "\n【保护触发】减小功率时增益超过上限 Gainmax = " << Gainmax << " dB" << std::endl;
+            std::cout << "当前增益 = " << currentGain << " dB，停止迭代" << std::endl;
+
+            // 按 Gainmax 反算输出功率
+            double limitedPout = currentPin * pow(10, Gainmax / 10.0);
+
+            datachange::tubeDataChange("tubeLength", L);
+            return {
+                currentPin,          // 真实输入功率
+                limitedPout,         // 按Gainmax计算的最大输出功率
+                powerInfo.midOutputPower,
+                0.0,                 // 过饱和度无意义
+                fre,
+                currentMaxPoint,
+                totalPoints
+            };
+        }
+        // =================================================================
+
+        int targetMin, targetMax;
+        if (powerInfo.valleyPower > 1e-10) {
+            if (powerInfo.valleyPower >= powerInfo.targetPeakPower * 0.9) {
+                double kuoda = powerInfo.globalMaxPoint - powerInfo.targetPeakPoint;
+                targetMin = (totalPoints / 2) - kuoda;
+                targetMax = (totalPoints / 2) + kuoda;
+            }
+            else {
+                targetMin = (totalPoints / 2) - 2;
+                targetMax = (totalPoints / 2) + 2;
+            }
+        }
+        else {
+            targetMin = (totalPoints / 2) - 2;
+            targetMax = (totalPoints / 2) + 2;
+        }
 
         std::cout << "迭代 " << iteration + 1 << ": pin=" << currentPin << "W, "
-            << "最大值点位置=" << currentMaxPoint << "/" << totalPoints
+            << "饱和点位置=" << currentMaxPoint << "/" << totalPoints
             << " 目标区间:[" << targetMin << "," << targetMax << "]";
 
-        // 检查是否在目标区间内
         if (currentMaxPoint >= targetMin && currentMaxPoint <= targetMax) {
             std::cout << " 符合要求" << std::endl;
 
             double oversaturation = 0;
-            if (powerInfo.maxOutputPower > powerInfo.endOutputPower) {
-                oversaturation = (powerInfo.maxOutputPower - powerInfo.endOutputPower) / powerInfo.maxOutputPower;
+            if (powerInfo.targetPeakPower > powerInfo.midOutputPower) {
+                oversaturation = (powerInfo.targetPeakPower - powerInfo.midOutputPower) / powerInfo.targetPeakPower;
             }
-
             std::cout << "\n最佳工作点: " << currentPin << " W" << std::endl;
-            datachange::tubeDataChange("tubeLength", L); // 恢复原值
+            std::cout << "全局最大输出功率: " << powerInfo.globalMaxPower << " W (第" << powerInfo.globalMaxPoint << "点)" << std::endl;
+            std::cout << "第一个符合阈值的极大值功率: " << powerInfo.targetPeakPower << " W (第" << powerInfo.targetPeakPoint << "点)" << std::endl;
+            if (powerInfo.valleyPower > 1e-10) {
+                std::cout << "极小值功率: " << powerInfo.valleyPower << " W (第" << powerInfo.valleyPoint << "点)" << std::endl;
+                double valleyRatio = (powerInfo.valleyPower / powerInfo.targetPeakPower) * 100;
+                std::cout << "极小值/极大值占比: " << valleyRatio << "%" << std::endl;
+            }
+            std::cout << "中点输出功率: " << powerInfo.midOutputPower << " W (第" << totalPoints / 2 << "点)" << std::endl;
+            std::cout << "过饱和度: " << oversaturation * 100 << "%" << std::endl;
+
+            datachange::tubeDataChange("tubeLength", L);
             return {
-                currentPin, powerInfo.maxOutputPower, powerInfo.endOutputPower,
-                oversaturation, currentMaxPoint, totalPoints
+                currentPin,
+                powerInfo.targetPeakPower,
+                powerInfo.midOutputPower,
+                oversaturation,
+                fre,
+                currentMaxPoint,
+                totalPoints
             };
         }
 
         int newDirection = 0;
         if (currentMaxPoint > targetMax) {
             std::cout << " → 最大值在末端，增大功率" << std::endl;
-            if (lastDirection == -1) { // 方向改变
+            if (lastDirection == -1) {
                 step_down /= 2;
+                step_up /= 2;
                 currentPin = currentPin + step_down;
             }
             else {
@@ -207,11 +413,13 @@ SaturationResult best_pin1(double fre, double V, double initialPin, double L)
         }
         else if (currentMaxPoint < targetMin) {
             std::cout << " → 最大值点太靠前，减小功率" << std::endl;
-            if (lastDirection == 1) { // 方向改变
+            if (lastDirection == 1) {
                 step_up /= 2;
-                currentPin = currentPin - step_up; // Corrected: Add step_up
+                step_down /= 2;
+                currentPin = currentPin - step_up;
             }
             else {
+                step_up /= 2;
                 step_down /= 2;
                 currentPin -= step_down;
                 newDirection = -1;
@@ -220,20 +428,18 @@ SaturationResult best_pin1(double fre, double V, double initialPin, double L)
 
         lastDirection = newDirection;
 
-        // 防止功率为负
         if (currentPin < 1e-10) {
             std::cout << "警告：功率过小，重置为最小值" << std::endl;
             currentPin = 1e-10;
         }
     }
 
-    datachange::tubeDataChange("tubeLength", L); // 恢复原值
+    datachange::tubeDataChange("tubeLength", L);
     std::cout << "未找到最佳工作点，达到最大迭代次数。" << std::endl;
     return {
-        currentPin, 0, 0, 0, 0, 0 // 返回默认值或错误值
+        currentPin, 0, 0, 0, 0,0, 0
     };
 }
-
 double mag_judge(double fre, double pin, double voltage,double mag_A,double mag_period) {
     // 保存当前的cout格式状态
     std::ios_base::fmtflags original_flags = std::cout.flags();
@@ -257,8 +463,8 @@ double mag_judge(double fre, double pin, double voltage,double mag_A,double mag_
     calculation::waitForAllTasks();
 
     // ===================== 检查电子流通率 =====================
-    int liutong_judge = 1;
-    bool baoluo_judge = true;
+    int liutong_judge = 0;
+    bool baoluo_judge = false;
 
     for (auto& seq : data.curCalGroup.res.reses) {
         for (auto& res : seq.second) {
@@ -270,6 +476,9 @@ double mag_judge(double fre, double pin, double voltage,double mag_A,double mag_
                     std::cout << rate << " ";
                     if (rate < 1.0) {
                         liutong_judge = 0;
+                    }
+                    else{
+                        liutong_judge = 1;
                     }
                 }
                 std::cout << std::endl;
@@ -315,6 +524,9 @@ double mag_judge(double fre, double pin, double voltage,double mag_A,double mag_
                         if (percentage >= 30.0) {
                             baoluo_judge = false;
                         }
+                        else{
+                            baoluo_judge = true;
+                        }
                     }
                 }
                 std::cout << std::endl;
@@ -351,26 +563,30 @@ double mag_judge(double fre, double pin, double voltage,double mag_A,double mag_
     }
 }
 
-double voltage_YOUHUA_Brief(double startV, double& start_voltage,
+LXjiegou voltage_YOUHUA_Brief(double startV, double& start_voltage,
     double& mag_A, double& mag_period)
 {
     double F = 0;
     double fre = (minfre + maxfre) / 2;
     double I = DianLiu::way_1(Pout, V, miu);
     BEST liu;
-    while (startV < V - Vcha || startV > V + Vcha)
+	jieduan L_L = { 0,0,0,0 };
+    LXjiegou jiegou = {0,0,0,0,0,0,0};
+    if (V < 6000) { V_change = 400; }
+	else if (V < 4000) { V_change = 200; }
+    while (startV <= V- 300 || startV > V + 300)
     {
-        if (startV < V - Vcha)
+        if (startV <= V - 300)
         {
             std::cout << "最佳电压低于目标范围" << std::endl;
             if (F == 1) { V_change = V_change / 2; }
             start_voltage = start_voltage + V_change;
 
-            LXjiegou jiegou = YOUHUA_sesan(minfre, maxfre, start_voltage, Pout, 0);//调整色散结构
+            jiegou = YOUHUA_sesan(minfre, maxfre, start_voltage, Pout, 0);//调整色散结构
             double r = 1000 * jiegou.Ra;
             datachange::beamDataChange("outerR", r / 2);
             datachange::beamDataChange("tunnelR", r);
-            convertTxtToJson(outputPath, dispdatapath, minfre - 1, maxfre + 1);//传入色散数据
+            convertTxtToJson(outputPath, dispdatapath, minfre - 1, maxfre + 1, L_L);//传入色散数据
 
             //--------------磁场优化------------
             while (mag_judge(fre, 0.001 * mostpin, V, mag_A, mag_period) == 0)
@@ -384,18 +600,18 @@ double voltage_YOUHUA_Brief(double startV, double& start_voltage,
             startV = liu.bestvoltage3(V, fre, I, Vjiange);//寻找最佳电压
             F = -1;
         }
-        else if (startV > V + Vcha)
+        else if (startV > V + 300)
         {
             std::cout << "最佳电压高于目标范围" << std::endl;
             if (F == -1) { V_change = V_change / 2; }
             start_voltage = start_voltage - V_change;
 
-            LXjiegou jiegou = YOUHUA_sesan(minfre, maxfre, start_voltage, Pout, 0);
+            jiegou = YOUHUA_sesan(minfre, maxfre, start_voltage, Pout, 0);
             double r = 1000 * jiegou.Ra;
             datachange::beamDataChange("outerR", r / 2);
             datachange::beamDataChange("tunnelR", r);
 
-            convertTxtToJson(outputPath, dispdatapath, minfre - 1, maxfre + 1);
+            convertTxtToJson(outputPath, dispdatapath, minfre - 1, maxfre + 1, L_L);
 
             //--------------磁场优化------------
             while (mag_judge(fre, 0.001 * mostpin, V, mag_A, mag_period) == 0)
@@ -410,16 +626,18 @@ double voltage_YOUHUA_Brief(double startV, double& start_voltage,
             F = 1;
         }
     }
-    return 1;
+    return jiegou;
 };
 
-double voltage_YOUHUA(double bestV, double test_voltage,double length,double mag_A,double mag_period) {
+LXjiegou voltage_YOUHUA(double bestV, double test_voltage,double length,double mag_A,double mag_period) {
     double F = 0;
     double r = 0;
     double small_pin = 0;
     double fre = (minfre + maxfre) / 2;
     double I = DianLiu::way_1(Pout, V, miu);
     BEST liu;
+	jieduan L_L = { 0,0,0,0 };
+    LXjiegou jiegou = { 0,0,0,0,0,0,0 };
     while (bestV < V - Vcha || bestV > V + Vcha)
     {
         if (bestV < V - Vcha)
@@ -428,11 +646,11 @@ double voltage_YOUHUA(double bestV, double test_voltage,double length,double mag
             if (F == 1) { V_change = V_change / 2; }
             test_voltage = test_voltage + V_change;
 
-            LXjiegou jiegou = YOUHUA_sesan(minfre, maxfre, test_voltage, Pout, 0);//调整色散结构
+            jiegou = YOUHUA_sesan(minfre, maxfre, test_voltage, Pout, 0);//调整色散结构
             r = 1000 * jiegou.Ra;
             datachange::beamDataChange("outerR", r / 2);
             datachange::beamDataChange("tunnelR", r);
-            convertTxtToJson(outputPath, dispdatapath, minfre - 1, maxfre + 1);//传入色散数据
+            convertTxtToJson(outputPath, dispdatapath, minfre - 1, maxfre + 1, L_L);//传入色散数据
 
             small_pin = smallpin(1, length);//小信号
             //--------------磁场优化------------
@@ -453,12 +671,12 @@ double voltage_YOUHUA(double bestV, double test_voltage,double length,double mag
             if (F == -1) { V_change = V_change / 2; }
             test_voltage = test_voltage - V_change;
 
-            LXjiegou jiegou = YOUHUA_sesan(minfre, maxfre, test_voltage, Pout, 0);
+            jiegou = YOUHUA_sesan(minfre, maxfre, test_voltage, Pout, 0);
             r = 1000 * jiegou.Ra;
             datachange::beamDataChange("outerR", r / 2);
             datachange::beamDataChange("tunnelR", r);
 
-            convertTxtToJson(outputPath, dispdatapath, minfre - 1, maxfre + 1);
+            convertTxtToJson(outputPath, dispdatapath, minfre - 1, maxfre + 1, L_L);
             small_pin = smallpin(1, length);
             //--------------磁场优化------------
             while (mag_judge(fre, small_pin, V, mag_A, mag_period) == 0)
@@ -474,20 +692,23 @@ double voltage_YOUHUA(double bestV, double test_voltage,double length,double mag
         }
     }
     std::cout << "最佳电压处于范围内" << std::endl;
-    return 1;
+    return jiegou;
 }
 
-L_YOUHUA L_from_Gain(double Gain1,double m)
+L_YOUHUA L_from_Gain(double Gain1, double m, double L)  // 仅新增Pout_const参数
 {
     L_YOUHUA liu1 = { 0,0,0,0 };
     double length_enough = 0;          //用来判断管长是否足够满足全频段增益达到目标值
-    double test_pin = 0.1;
-    double test_length = 500;
+    double test_pin = Pout / pow(10, Gain1 / 10.0);
+    test_pin = std::round(test_pin * 100) / 100;
+    double test_length = L*1.5;
     double C = 0;
-    double A1 = 0.1;
-    double A2 = 0.1;
+    double A1 = test_pin;
+    double A2 = test_pin;
     double D = 0;
     double maxpout = 0;
+    const double threshold = 0.2 * Pout;  // 新增：计算阈值
+
     while (length_enough == 0)
     {
         double now_Gain = 0;
@@ -522,20 +743,38 @@ L_YOUHUA L_from_Gain(double Gain1,double m)
                         for (auto& out : powerSequence) {
                             std::cout << out << " ";
                         }
-                        auto maxIt = std::max_element(powerSequence.begin(), powerSequence.end());
-                        size_t maxIndex = std::distance(powerSequence.begin(), maxIt);
-                        size_t totalPoints = powerSequence.size();
+                        std::cout << std::endl;  // 新增：优化输出格式
 
-                        // 检查是否在终点
-                        if (maxIndex == totalPoints - 1) {
-                            now_Gain = 10 * log10(*maxIt / test_pin);
+                        // ========== 核心修改开始 ==========
+                        size_t targetIndex = -1;  // 目标极大值点索引
+                        double targetPout = 0;    // 目标极大值点功率
+
+                        // 遍历找第一个超过阈值的极大值点（跳过首尾避免越界）
+                        for (size_t i = 1; i < powerSequence.size() - 1; ++i) {
+                            // 判定极大值点：当前点 > 左右相邻点，且超过阈值
+                            bool isPeak = (powerSequence[i] > powerSequence[i - 1]) && (powerSequence[i] > powerSequence[i + 1]);
+                            if (isPeak && powerSequence[i] > threshold) {
+                                targetIndex = i;
+                                targetPout = powerSequence[i];
+                                break;  // 找到第一个符合条件的点就退出
+                            }
+                        }
+
+                        if (targetIndex == -1) {
+                            targetIndex = powerSequence.size() - 1;
+                            targetPout = powerSequence[targetIndex];
+                        }
+                        // ========== 核心修改结束 ==========
+
+                        if (targetIndex == powerSequence.size() - 1) {
+                            now_Gain = 10 * log10(targetPout / test_pin);
                             enough = 1;
-                            test_length = test_length + 500;
+                            test_length = test_length + test_length;
                         }
                         else {
-                            now_Gain = 10 * log10(*maxIt / test_pin);
-                            correspondingLength = static_cast<double>(maxIndex) / totalPoints * test_length;
-                            maxpout = *maxIt;
+                            now_Gain = 10 * log10(targetPout / test_pin);
+                            correspondingLength = static_cast<double>(targetIndex) / powerSequence.size() * test_length;
+                            maxpout = targetPout;  // 替换为目标极大值点功率
                             enough = 0;
                         }
                     }
@@ -566,24 +805,25 @@ L_YOUHUA L_from_Gain(double Gain1,double m)
             A2 = A2 / 2;
             test_pin += A2;
         }
-        std::cout << "增益" << now_Gain << "对应管长" << correspondingLength << "最大输出功率" << maxpout << std::endl;
+        std::cout << "增益" << now_Gain << "对应管长" << correspondingLength << "目标极大值功率" << maxpout << std::endl;
         liu1.gain = now_Gain;
-		liu1.tubeLength = correspondingLength;
-		liu1.maxPout = maxpout;
-		liu1.optimalPin = test_pin;
+        liu1.tubeLength = correspondingLength;
+        liu1.maxPout = maxpout;  // 存储目标极大值点功率
+        liu1.optimalPin = test_pin;
     };
 
     return liu1;
 }
 
 
-double L_from_smallGain(double targetGain) {
+double L_from_smallGain(double targetGain,double L) {
     std::cout << "寻找增益 " << targetGain << " dB 对应的位置" << std::endl;
     std::cout << "输入功率: " << 0.01 << std::endl;
 
     // 设置参数
     datachange::changecalsetting("pin", 0.01);
-    datachange::tubeDataChange("tubeLength", 500);
+    double L1 = std::round(L * 1000 * 300 * 100) / 100;
+    datachange::tubeDataChange("tubeLength", L1);
 
     // 执行计算
     filesystem::path projectPath = Projectpath;
@@ -613,12 +853,12 @@ double L_from_smallGain(double targetGain) {
                     // 检查是否达到目标增益
                     if (gain >= targetGain) {
                         // 计算对应的位置管长
-                        double positionLength = static_cast<double>(i) / powerSequence.size() * 500;
+                        double positionLength = static_cast<double>(i) / powerSequence.size() * L1;
 
                         std::cout << "\n找到增益 " << gain << " dB 的位置:" << std::endl;
                         std::cout << "输出功率: " << pout << " W" << std::endl;
                         std::cout << "位置索引: " << i << "/" << powerSequence.size() << std::endl;
-                        std::cout << "对应管长: " << positionLength << " (总管长: " << 500 << ")" << std::endl;
+                        std::cout << "对应管长: " << positionLength << " (总管长: " << L1 << ")" << std::endl;
 
                         return positionLength;
                     }
@@ -631,3 +871,84 @@ double L_from_smallGain(double targetGain) {
     std::cout << "警告：未找到增益 " << targetGain << " dB 的点！" << std::endl;
     return -1;  // 未找到
 }
+
+void writeDataToFile(const std::string& filename, LXjiegou jiegou, double L,jieduan LL,
+    SaturationResult NN_1,
+    SaturationResult NN_2,
+    SaturationResult NN_3,
+    SaturationResult NN_21,
+    SaturationResult NN_22,
+    SaturationResult NN_23,
+    SaturationResult NN_11,
+    SaturationResult NN_12,
+    SaturationResult NN_13
+    ) {
+
+    // 创建输出文件流
+    std::ofstream outfile(filename);
+    if (!outfile.is_open()) {
+        std::cerr << "错误：无法打开文件 " << filename << " 进行写入！" << std::endl;
+        return;
+    }
+    outfile << "#设计参数:" << std::endl;
+    outfile << "工作电压:" << V << "V" << std::endl;
+    outfile << "工作频段:" << minfre << "GHz - " << maxfre << "GHz" << std::endl;
+    outfile << "增益:" << Gain <<"db" << std::endl;
+    outfile << "输出功率:" << Pout <<"W" << std::endl;
+    outfile << std::endl;  
+    outfile << "# 色散结构参数:" << std::endl;
+    outfile << "螺旋线内半径=" << jiegou.Ra*1000 << " mm" << std::endl;
+    outfile << "螺旋线外半径=" << jiegou.Rb * 1000 << " mm" << std::endl;
+    outfile << "螺距=" << jiegou.L * 1000 << " mm" << std::endl;
+    outfile << "屏蔽壳内径=" << jiegou.Rc * 1000 << " mm" << std::endl;
+    outfile << "翼片内半径=" << jiegou.Rg * 1000 << " mm" << std::endl;
+    outfile << "螺旋线宽度=" << jiegou.del * 1000 << " mm" << std::endl;
+    outfile << "翼片角度=" << jiegou.fir << std::endl;
+    outfile << std::endl;  
+    outfile << "最终管长:" << L << "mm" << std::endl;
+	outfile << "一段衰减:" << LL.A << "mm--" <<LL.B<<"mm" << std::endl;
+    outfile << "二段衰减:" << LL.C << "mm--" << LL.D << "mm" << std::endl;
+	outfile << "截断" << LL.B << "mm--" << LL.C << "mm" << std::endl;
+    outfile << std::endl;
+    outfile << "# 工作频率(Hz)\t增益(dB)\t最佳输入功率(W)\t输出功率(W)" << std::endl;
+
+    // 设置输出格式
+    outfile << std::fixed << std::setprecision(6);  // 保留6位小数
+
+    // 原来的三个主要频率点
+    double gain1 = 10 * log10(NN_2.maxOutputPower / NN_2.optimalPin);
+    outfile << NN_2.workfre << "\t" << gain1 << "\t" << NN_2.optimalPin << "\t" << NN_2.maxOutputPower << "\n";
+
+    // NN_21 到 NN_23 (低频段到中心频率之间)
+    double gain21 = 10 * log10(NN_21.maxOutputPower / NN_21.optimalPin);
+    outfile << NN_21.workfre << "\t" << gain21 << "\t"<< NN_21.optimalPin << "\t" << NN_21.maxOutputPower << "\n";
+
+    double gain22 = 10 * log10(NN_22.maxOutputPower / NN_22.optimalPin);
+    outfile << NN_22.workfre << "\t" << gain22 << "\t" << NN_22.optimalPin << "\t" << NN_22.maxOutputPower << "\n";
+
+    double gain23 = 10 * log10(NN_23.maxOutputPower / NN_23.optimalPin);
+    outfile << NN_23.workfre << "\t" << gain23 << "\t" << NN_23.optimalPin << "\t" << NN_23.maxOutputPower << "\n";
+
+    double gain2 = 10 * log10(NN_1.maxOutputPower / NN_1.optimalPin);
+    outfile << NN_1.workfre << "\t" << gain2 << "\t" << NN_1.optimalPin << "\t" << NN_1.maxOutputPower << "\n";
+
+    // NN_11 到 NN_13 (中心频率到高频段之间)
+    double gain11 = 10 * log10(NN_11.maxOutputPower / NN_11.optimalPin);
+    outfile << NN_11.workfre << "\t" << gain11 << "\t" << NN_11.optimalPin << "\t" << NN_11.maxOutputPower << "\n";
+
+    double gain12 = 10 * log10(NN_12.maxOutputPower / NN_12.optimalPin);
+    outfile << NN_12.workfre << "\t" << gain12 << "\t" << NN_12.optimalPin << "\t" << NN_12.maxOutputPower << "\n";
+
+    double gain13 = 10 * log10(NN_13.maxOutputPower / NN_13.optimalPin);
+    outfile << NN_13.workfre << "\t" << gain13 << "\t" << NN_13.optimalPin << "\t" << NN_13.maxOutputPower << "\n";
+
+    double gain3 = 10 * log10(NN_3.maxOutputPower / NN_3.optimalPin);
+    outfile << NN_3.workfre << "\t" << gain3 << "\t" << NN_3.optimalPin << "\t" << NN_3.maxOutputPower << "\n";
+
+    // 关闭文件
+    outfile.close();
+
+    std::cout << "数据已成功写入文件: " << filename << std::endl;
+}
+
+

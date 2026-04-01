@@ -146,3 +146,4 @@ void renew_input(LXjiegou jiegou)
     };
     modifyCoordinates(inputPath, newCoords);
 };
+

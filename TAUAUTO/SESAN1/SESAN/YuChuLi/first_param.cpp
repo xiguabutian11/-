@@ -12,8 +12,7 @@ LXsesan  SeSanMuBiao(double minfre, double maxfre, double voltage, double Pmax,d
 	LXtarget.vp = XiangSu::way_1(voltage, AA);
 	LXtarget.I = DianLiu::way_1(Pmax, voltage, miu);
 	LXtarget.kc = ZuKang::way_1(voltage, LXtarget.I, Pmax, MM)+N;
-
-	double xiangduigongzuodaikuang = (LXtarget.fmax - LXtarget.fmin) / LXtarget.f;
+    double xiangduigongzuodaikuang = (LXtarget.fmax - LXtarget.fmin) / LXtarget.f;
 
 	if (std::fmod(std::log2(LXtarget.fmax / LXtarget.fmin), 1.0) == 0.0) {
 		std::cout << "此管子为倍频管" << std::endl;
@@ -39,6 +38,5 @@ LXjiegou SeSanJieGou(LXsesan LXtarget)
 
 	renew_input(guanzi1);
 
-	shuchu::A2(LXtarget.vp, LXtarget.I, LXtarget.kc, guanzi1.Ra, guanzi1.Rb, guanzi1.Rc, guanzi1.Rg, guanzi1.L, guanzi1.del);
 	return guanzi1;
 };
