@@ -160,3 +160,75 @@ bool datachange::lossDataChange(int mode, double firstBegin, double firstEnd, do
     file.close();
     return 1;
 }
+
+
+bool datachange::lossDataChange_2(
+    double A, double A1,
+    double B, double B2,
+    double C, double C3,
+    double D, double D4
+)
+{
+    std::ofstream file(lossDataPath);
+    if (!file.is_open()) {
+        std::cerr << "Error: Cannot open file: " << lossDataPath << std::endl;
+        return false;
+    }
+
+    std::ostringstream oss;
+    oss << std::fixed << std::setprecision(2);
+
+    oss << "{\n";
+    oss << "   \"cutOffs\" : [\n";
+    oss << "      {\n";
+    oss << "         \"begin\" : " << A1 << ",\n";
+    oss << "         \"end\" : " << B << "\n";
+    oss << "      },\n";
+    oss << "      {\n";
+    oss << "         \"begin\" : " << C3 << ",\n";
+    oss << "         \"end\" : " << D << "\n";
+    oss << "      }\n";
+    oss << "   ],\n";
+    oss << "   \"lossSegs\" : [\n";
+
+    // 第一段有效区域
+    oss << "      {\n";
+    oss << "         \"begin\" : " << A << ",\n";
+    oss << "         \"defaultDistriType\" : 0,\n";
+    oss << "         \"defaultdB\" : 24.0,\n";
+    oss << "         \"end\" : " << A1 << ",\n";
+    oss << "         \"lossType\" : 0\n";
+    oss << "      },\n";
+
+    // 第二段有效区域
+    oss << "      {\n";
+    oss << "         \"begin\" : " << B << ",\n";
+    oss << "         \"defaultDistriType\" : 1,\n";
+    oss << "         \"defaultdB\" : 24.0,\n";
+    oss << "         \"end\" : " << B2 << ",\n";
+    oss << "         \"lossType\" : 0\n";
+    oss << "      },\n";
+    
+    oss << "      {\n";
+    oss << "         \"begin\" : " << C << ",\n";
+    oss << "         \"defaultDistriType\" : 0,\n";
+    oss << "         \"defaultdB\" : 24.0,\n";
+    oss << "         \"end\" : " << C3 << ",\n";
+    oss << "         \"lossType\" : 0\n";
+    oss << "      },\n";
+
+    oss << "      {\n";
+    oss << "         \"begin\" : " << D << ",\n";
+    oss << "         \"defaultDistriType\" : 1,\n";
+    oss << "         \"defaultdB\" : 24.0,\n";
+    oss << "         \"end\" : " << D4 << ",\n";
+    oss << "         \"lossType\" : 0\n";
+    oss << "      }\n";
+
+    oss << "   ]\n";
+    oss << "}";
+
+    file << oss.str();
+    file.close();
+    return true;
+}

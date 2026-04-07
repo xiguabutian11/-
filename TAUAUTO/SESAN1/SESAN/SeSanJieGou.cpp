@@ -1,7 +1,7 @@
 #include "SeSanJieGou.h"
 
 void convertTxtToJson(const std::string& inputFile, const std::string& outputFile,
-    double minfre, double maxfre, jieduan LL) {
+    double minfre, double maxfre, jieduan LL,jieduan LL2) {
     std::ifstream infile(inputFile);
     std::string line;
     std::vector<double> freq;
@@ -79,10 +79,17 @@ void convertTxtToJson(const std::string& inputFile, const std::string& outputFil
         outfile << "    {\"dispKey\": \"position_1\", \"interpoType\": 0, \"point\": 1},\n";
         outfile << "    {\"dispKey\": \"position_1\", \"interpoType\": 0, \"point\": 2}\n";
     }
-    else if (LL.B!=0){
+    else if (LL.B!=0&&LL2.B==0){
     outfile << "    {\"dispKey\": \"position_1\", \"interpoType\": 0, \"point\": 0.0},\n";
     outfile << "    {\"dispKey\": \"position_1\", \"interpoType\": 1, \"point\": " << LL.B << "},\n";
     outfile << "    {\"dispKey\": \"position_1\", \"interpoType\": 0, \"point\": " << LL.C << "}\n";
+    }
+    else if (LL.B!=0&&LL2.B!=0) {
+        outfile << "    {\"dispKey\": \"position_1\", \"interpoType\": 0, \"point\": 0.0},\n";
+        outfile << "    {\"dispKey\": \"position_1\", \"interpoType\": 1, \"point\": " << LL.B << "},\n";
+        outfile << "    {\"dispKey\": \"position_1\", \"interpoType\": 0, \"point\": " << LL.C << "},\n";
+        outfile << "    {\"dispKey\": \"position_1\", \"interpoType\": 1, \"point\": " << LL2.B << "},\n";
+        outfile << "    {\"dispKey\": \"position_1\", \"interpoType\": 0, \"point\": " << LL2.C << "}\n";
     }
     outfile << "  ]\n";
     outfile << "}\n";

@@ -180,9 +180,6 @@
     <ClCompile Include="cal_change\find_voltage.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="NEW\tube_length.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="NEW\gongshi.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -226,6 +223,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="SESAN1\SESAN\SeSanJieGou.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="XIGUA.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -332,9 +332,6 @@
     <ClInclude Include="cal_change\find_voltage.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="NEW\tube_length.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="NEW\gongshi.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -384,6 +381,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="SESAN1\SESAN\SeSanJieGou.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="XIGUA.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

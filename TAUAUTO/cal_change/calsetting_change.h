@@ -32,4 +32,11 @@ public:
 	static bool r(double r1, double r2);//r1为电子束外径，r2为通道半径
 
 	static bool lossDataChange(int mode, double firstBegin, double firstEnd, double secondBegin, double secondEnd);
+
+	static bool lossDataChange_2(
+		double A, double A1,
+		double B, double B2,
+		double C, double C3,
+		double D, double D4
+	);
 };

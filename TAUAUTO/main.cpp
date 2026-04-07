@@ -10,21 +10,20 @@ void clearTempFolder() {
 	fs::create_directory(temp_path);
 }
 
+double guanzi_type;
 
 int main(){
-	double guanzi_type = 1;
+	guanzi_type = 1;
 	if (Gain > 20 && Gain < 45) { guanzi_type = 2; }
 	else if (Gain>=45&&Gain < 70) { 
 		guanzi_type = 3; 
-		std::cerr << "目前不支持计算三段管子" << std::endl;
-		exit(EXIT_FAILURE);
 	}
 	else if (Gain>=70)
 	{
 		std::cerr << "错误：增益过大（>=70dB），程序终止！" << std::endl;
 		exit(EXIT_FAILURE);  
 	}
-
+	
 	clearTempFolder();
 	if (V < 2500) {
 		std::cout << "电压过低，电压设为2500" << std::endl;
@@ -35,16 +34,17 @@ int main(){
 	//=============================================
     BEST liu;
 	jieduan L_L = { 0,0,0,0 };
+	jieduan L_L_2 = { 0,0,0,0 };
 	LXjiegou jiegou = YOUHUA_sesan(minfre, maxfre, V, Pout, 0);
 	
-	double step = std::round(jiegou.L * 1000 * 0.3 * 100) / 100;
+	double step = two_point(jiegou.L * 1000 * 0.3);
 	if (step >= 1) { step = 1; }
 	datachange::tubeDataChange("interstep", step);
 	
 	double r = 1000 * jiegou.Ra;                //单位mm 
 	datachange::beamDataChange("outerR", 0.5*r);
 	datachange::beamDataChange("tunnelR", r);
-	convertTxtToJson(outputPath, dispdatapath, minfre-1, maxfre+1, L_L);
+	convertTxtToJson(outputPath, dispdatapath, minfre-1, maxfre+1, L_L,L_L_2);
 	double I = DianLiu::way_1(Pout, V, miu);
 	double fre = (minfre + maxfre) / 2;
 	//--------------管长和磁场的初始化---------------
@@ -72,7 +72,7 @@ int main(){
 		jiegou = old_jiegou;
 	}
 	//--------------根据管长找小信号功率---------------
-	double small_pin = smallpin(1,length);             
+	double small_pin = smallpin(length);             
 	//--------------寻找最佳电压---------------
 	double bestV = liu.bestvoltage3(V, fre, I, Vjiange);              //实际最佳电压变量
 	double test_voltage = start_voltage;                              //设计目标时涉及的电压
@@ -87,8 +87,10 @@ int main(){
 	}
 	//--------------寻找截断对应的管长位置---------------
 	double L_cut;
+	double L_cut_2;
 	if (guanzi_type ==2) {
-		L_cut = std::round(L_from_smallGain(15, jiegou.L) * 100) / 100;
+		L_cut = two_point(L_from_smallGain(Gain*0.45, jiegou.L));
+		std::cout << "双段管子截断位置：" << L_cut << "mm" << std::endl;
 		if (L_cut < 20)
 		{
 			L_L.A = L_cut * 0.6;
@@ -104,11 +106,43 @@ int main(){
 		}
 		//---------------回归双段管子----------------
 		datachange::lossDataChange(1, L_L.A, L_L.B, L_L.C, L_L.D);
-		convertTxtToJson(outputPath, dispdatapath, minfre - 1, maxfre + 1, L_L);
+		convertTxtToJson(outputPath, dispdatapath, minfre - 1, maxfre + 1, L_L, L_L_2);
 	}
+	
+	if (guanzi_type == 3) {
+		L_cut = two_point(L_from_smallGain(Gain * 0.3, jiegou.L));
+		std::cout << "三段管子第一处截断位置：" << L_cut << "mm" << std::endl;
+		if (L_cut < 20)
+		{
+			L_L.A = L_cut * 0.6;
+			L_L.B = L_cut * 0.9;
+			L_L.C = L_cut * 1.1;
+			L_L.D = L_cut * 1.4;
+		}
+		else {
+			L_L.A = L_cut - 8;
+			L_L.B = L_cut - 2;
+			L_L.C = L_cut + 2;
+			L_L.D = L_cut + 8;
+		}
+		//---------------回归双段管子----------------
+		datachange::lossDataChange(1, L_L.A, L_L.B, L_L.C, L_L.D);
+		convertTxtToJson(outputPath, dispdatapath, minfre - 1, maxfre + 1, L_L, L_L_2);
+	
+		L_cut_2 = two_point(L_from_smallGain(Gain * 0.65, jiegou.L));
+		std::cout << "三段管子第二处截断位置：" << L_cut_2 << "mm" << std::endl;
+		L_L_2.A = L_cut_2 - 8;
+		L_L_2.B = L_cut_2 - 2;
+		L_L_2.C = L_cut_2 + 2;
+		L_L_2.D = L_cut_2 + 8;
+
+		datachange::lossDataChange_2(L_L.A, L_L.B, L_L.C, L_L.D, L_L_2.A, L_L_2.B, L_L_2.C, L_L_2.D);
+		convertTxtToJson(outputPath, dispdatapath, minfre - 1, maxfre + 1, L_L, L_L_2);
+	}
+
 	//---------------管长和输入功率固定----------------
 	datachange::changecalsetting("pin",0.01 );
-	double L1= std::round(jiegou.L * 1000 * 300 * 100) / 100;
+	double L1 = two_point(pre_length(jiegou.L));
 	datachange::tubeDataChange("tubeLength", L1);
 	//================对之后要比较的频点都进行磁场优化================
 	while (
@@ -126,12 +160,11 @@ int main(){
 	//================对多个频点进行比较================
 	double bestfre = liu.bestfre();
 	datachange::changecalsetting("frequency", bestfre);
-	//==============找到最低限度的管长=================
+	//==============获得大磁场下的一个偏长管长=================
 	L_YOUHUA LL;
-	if (guanzi_type == 1) {LL = L_from_Gain(Gain, 0.5, L1); }
-	if (guanzi_type == 2) {LL = L_from_Gain(Gain, 0.5, L_cut); }
+	LL = L_from_Gain(Gain, 0.5, L1);
 	datachange::tubeDataChange("tubeLength", LL.tubeLength);
-	//--------------三点磁场优化------------感觉磁场优化应该在改变完管长就该调整了，不该管长变完再调整磁场
+	//--------------三点磁场优化------------
 	while (mag_judge(fre, small_pin, V, mag_A, mag_period) == 0 ||
 		mag_judge(minfre, small_pin, V, mag_A, mag_period) == 0 ||
 		mag_judge(maxfre, small_pin, V, mag_A, mag_period) == 0)
@@ -198,7 +231,7 @@ int main(){
 	SaturationResult NN_13 = best_pin1(fre + gezi * 3, bestV, LL.optimalPin, LL.tubeLength);
 
 	//---------添加一个增益检测----------
-	writeDataToFile("gain_data.txt",jiegou,LL.tubeLength,L_L,
+	writeDataToFile("gain_data.txt",jiegou,LL.tubeLength,L_L, L_L_2,
 		NN_1,NN_2,NN_3,
 		NN_21, NN_22,NN_23
 	, NN_11, NN_12, NN_13);

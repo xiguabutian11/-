@@ -46,7 +46,21 @@ PowerResult HuZuoYong(double fre, double pin, double voltage)
 
                 if (result.totalPoints > 0) {
                    // ========== 1. 查找第一个超过阈值的极大值点 ==========
-                    const double threshold = 0.5 * Pout;
+                    double threshold = 0.0;
+
+                    if (guanzi_type == 1)
+                    {
+                        threshold = pin * pow(10, 5 / 10.0);
+                    }
+                    else if (guanzi_type == 2)
+                    {
+                        threshold = pin * pow(10, two_point(Gain * 0.45) / 10.0);
+                    }
+                    else if (guanzi_type == 3)
+                    {
+                        threshold = pin * pow(10, two_point(Gain * 0.65) / 10.0);
+                    }
+
                     int targetPeakPointIdx = -1; // 0开始
                     double targetPeakPower = 0.0;
 
@@ -88,11 +102,10 @@ PowerResult HuZuoYong(double fre, double pin, double voltage)
                         }
                     }
 
-                    // 兼容逻辑：没找到符合条件的极大值点，降级使用原最大值逻辑
+                    // 兼容逻辑：没找到符合条件的极大值点，使用【最后一个点】
                     if (targetPeakPointIdx == -1) {
-                        auto maxIt = std::max_element(poutArray.begin(), poutArray.end());
-                        targetPeakPower = *maxIt;
-                        targetPeakPointIdx = std::distance(poutArray.begin(), maxIt);
+                        targetPeakPointIdx = result.totalPoints - 1;  
+                        targetPeakPower = poutArray[targetPeakPointIdx];
                     }
 
                     // ========== 2. 提取全局最大值（原有逻辑） ==========
@@ -193,7 +206,7 @@ int pout_yes(double fre, double pin, double voltage)
     return hasValidValue ? 1 : 0;
 }
 
-double smallpin(double guanzi_type, double L)
+double smallpin(double L)
 {
     double A = 0;
     double pin = 0.1;
@@ -258,9 +271,14 @@ double smallpin(double guanzi_type, double L)
             MAXPOINT = extremePoints[0];
             std::cout << ", 管子类型1取第一个极值点, 位置=" << MAXPOINT;
         }
-        else if (guanzi_type == 2 && extremePoints.size() >= 2) {
+        else if (guanzi_type == 2 ) {
             // 类型2：取第二个极值点
-            MAXPOINT = extremePoints[1];
+            MAXPOINT = extremePoints[0];
+            std::cout << ", 管子类型2取第二个极值点, 位置=" << MAXPOINT;
+        }
+        else if (guanzi_type == 3 ) {
+            // 类型2：取第二个极值点
+            MAXPOINT = extremePoints[0];
             std::cout << ", 管子类型2取第二个极值点, 位置=" << MAXPOINT;
         }
 
@@ -299,11 +317,6 @@ SaturationResult best_pin1(double fre, double V, double initialPin, double L)
     double Gainmax = 25;
     if (Gain > 20 && Gain < 45) { Gainmax = 50; }
     else if (Gain < 70) { Gainmax = 75; }
-    // 这里你原来的代码 >=70 没处理，我帮你加上安全判断
-    else if (Gain >= 70) {
-        std::cerr << "错误：增益过大 >=70dB，程序终止！" << std::endl;
-        exit(EXIT_FAILURE);
-    }
 
     datachange::tubeDataChange("tubeLength", 2 * L);
     double currentPin = initialPin;
@@ -574,9 +587,9 @@ LXjiegou voltage_YOUHUA_Brief(double startV, double& start_voltage,
     LXjiegou jiegou = {0,0,0,0,0,0,0};
     if (V < 6000) { V_change = 400; }
 	else if (V < 4000) { V_change = 200; }
-    while (startV <= V- 300 || startV > V + 300)
+    while (startV < V- 500 || startV > V + 500)
     {
-        if (startV <= V - 300)
+        if (startV <V - 500)
         {
             std::cout << "最佳电压低于目标范围" << std::endl;
             if (F == 1) { V_change = V_change / 2; }
@@ -586,7 +599,7 @@ LXjiegou voltage_YOUHUA_Brief(double startV, double& start_voltage,
             double r = 1000 * jiegou.Ra;
             datachange::beamDataChange("outerR", r / 2);
             datachange::beamDataChange("tunnelR", r);
-            convertTxtToJson(outputPath, dispdatapath, minfre - 1, maxfre + 1, L_L);//传入色散数据
+            convertTxtToJson(outputPath, dispdatapath, minfre - 1, maxfre + 1, L_L, L_L);//传入色散数据
 
             //--------------磁场优化------------
             while (mag_judge(fre, 0.001 * mostpin, V, mag_A, mag_period) == 0)
@@ -600,7 +613,7 @@ LXjiegou voltage_YOUHUA_Brief(double startV, double& start_voltage,
             startV = liu.bestvoltage3(V, fre, I, Vjiange);//寻找最佳电压
             F = -1;
         }
-        else if (startV > V + 300)
+        else if (startV > V + 500)
         {
             std::cout << "最佳电压高于目标范围" << std::endl;
             if (F == -1) { V_change = V_change / 2; }
@@ -611,7 +624,7 @@ LXjiegou voltage_YOUHUA_Brief(double startV, double& start_voltage,
             datachange::beamDataChange("outerR", r / 2);
             datachange::beamDataChange("tunnelR", r);
 
-            convertTxtToJson(outputPath, dispdatapath, minfre - 1, maxfre + 1, L_L);
+            convertTxtToJson(outputPath, dispdatapath, minfre - 1, maxfre + 1, L_L, L_L);
 
             //--------------磁场优化------------
             while (mag_judge(fre, 0.001 * mostpin, V, mag_A, mag_period) == 0)
@@ -650,9 +663,9 @@ LXjiegou voltage_YOUHUA(double bestV, double test_voltage,double length,double m
             r = 1000 * jiegou.Ra;
             datachange::beamDataChange("outerR", r / 2);
             datachange::beamDataChange("tunnelR", r);
-            convertTxtToJson(outputPath, dispdatapath, minfre - 1, maxfre + 1, L_L);//传入色散数据
+            convertTxtToJson(outputPath, dispdatapath, minfre - 1, maxfre + 1, L_L, L_L);//传入色散数据
 
-            small_pin = smallpin(1, length);//小信号
+            small_pin = smallpin(length);//小信号
             //--------------磁场优化------------
             while (mag_judge(fre, small_pin, V, mag_A, mag_period) == 0)
             { 
@@ -676,8 +689,8 @@ LXjiegou voltage_YOUHUA(double bestV, double test_voltage,double length,double m
             datachange::beamDataChange("outerR", r / 2);
             datachange::beamDataChange("tunnelR", r);
 
-            convertTxtToJson(outputPath, dispdatapath, minfre - 1, maxfre + 1, L_L);
-            small_pin = smallpin(1, length);
+            convertTxtToJson(outputPath, dispdatapath, minfre - 1, maxfre + 1, L_L, L_L);
+            small_pin = smallpin(length);
             //--------------磁场优化------------
             while (mag_judge(fre, small_pin, V, mag_A, mag_period) == 0)
             {
@@ -700,14 +713,26 @@ L_YOUHUA L_from_Gain(double Gain1, double m, double L)  // 仅新增Pout_const�
     L_YOUHUA liu1 = { 0,0,0,0 };
     double length_enough = 0;          //用来判断管长是否足够满足全频段增益达到目标值
     double test_pin = Pout / pow(10, Gain1 / 10.0);
-    test_pin = std::round(test_pin * 100) / 100;
-    double test_length = L*1.5;
+    double test_length = L;
     double C = 0;
     double A1 = test_pin;
     double A2 = test_pin;
     double D = 0;
     double maxpout = 0;
-    const double threshold = 0.2 * Pout;  // 新增：计算阈值
+    double threshold = 0.0;
+
+    if (guanzi_type == 1)
+    {
+        threshold = test_pin * pow(10, 5 / 10.0);
+    }
+    else if (guanzi_type == 2)
+    {
+        threshold = test_pin * pow(10, two_point(Gain * 0.45) / 10.0);
+    }
+    else if (guanzi_type == 3)
+    {
+        threshold = test_pin * pow(10, two_point(Gain * 0.65) / 10.0);
+    }
 
     while (length_enough == 0)
     {
@@ -816,63 +841,72 @@ L_YOUHUA L_from_Gain(double Gain1, double m, double L)  // 仅新增Pout_const�
 }
 
 
-double L_from_smallGain(double targetGain,double L) {
-    std::cout << "寻找增益 " << targetGain << " dB 对应的位置" << std::endl;
-    std::cout << "输入功率: " << 0.01 << std::endl;
+double L_from_smallGain(double targetGain, double L)
+{
+    double test_pin = 0.001;
+    datachange::changecalsetting("pin", test_pin);
 
-    // 设置参数
-    datachange::changecalsetting("pin", 0.01);
-    double L1 = std::round(L * 1000 * 300 * 100) / 100;
-    datachange::tubeDataChange("tubeLength", L1);
+    double test_length = two_point(pre_length(L));
+    double correspondingLength = 0;
+    int enough = 1;  
+    while (enough == 1)
+    {
+        datachange::tubeDataChange("tubeLength", test_length);
 
-    // 执行计算
-    filesystem::path projectPath = Projectpath;
-    usrData& data = usrData::getInstance();
+        filesystem::path projectPath = Projectpath;
+        usrData& data = usrData::getInstance();
 
-    if (!projManage::openProj(projectPath.string())) {
-        for (auto& msg : data.curCalGroup.message) {
-            std::cerr << msg.str << std::endl;
+        if (!projManage::openProj(projectPath.string())) {
+            for (auto& msg : data.curCalGroup.message) {
+                std::cerr << msg.str << std::endl;
+            }
+            continue;
         }
-        return -1;
-    }
 
-    calculation::seqCalculate();
-    calculation::waitForAllTasks();
+        calculation::seqCalculate();
+        calculation::waitForAllTasks();
 
-    // 遍历结果，找到目标增益对应的位置
-    for (auto& seq : data.curCalGroup.res.reses) {
-        for (auto& res : seq.second) {
-            if (!res.result.Pout.empty()) {
-                auto& powerSequence = res.result.Pout[0];
+        for (auto& seq : data.curCalGroup.res.reses) {
+            for (auto& res : seq.second) {
+                if (!res.result.Pout.empty()) {
+                    auto& powerSequence = res.result.Pout[0];
+                    bool foundGain = false;
 
-                std::cout << "频率 " << res.freqy.freq << " GHz 的功率序列: ";
-                for (size_t i = 0; i < powerSequence.size(); ++i) {
-                    double pout = powerSequence[i];
-                    double gain = 10 * log10(pout / 0.01);
+                    std::cout << "频率 " << res.freqy.freq << " GHz 功率序列: ";
+                    for (auto& out : powerSequence) {
+                        std::cout << out << " ";
+                    }
+                    std::cout << std::endl;
 
-                    // 检查是否达到目标增益
-                    if (gain >= targetGain) {
-                        // 计算对应的位置管长
-                        double positionLength = static_cast<double>(i) / powerSequence.size() * L1;
+                    for (size_t i = 0; i < powerSequence.size(); ++i) {
+                        double pout = powerSequence[i];
+                        double gain = 10 * log10(pout / test_pin);
 
-                        std::cout << "\n找到增益 " << gain << " dB 的位置:" << std::endl;
-                        std::cout << "输出功率: " << pout << " W" << std::endl;
-                        std::cout << "位置索引: " << i << "/" << powerSequence.size() << std::endl;
-                        std::cout << "对应管长: " << positionLength << " (总管长: " << L1 << ")" << std::endl;
+                        if (gain >= targetGain) {
+                            // 找到增益点 → 计算长度
+                            correspondingLength = (double)i / powerSequence.size() * test_length;
+                            foundGain = true;
+                            enough = 0;
 
-                        return positionLength;
+                            std::cout << "→ 找到目标增益: " << gain << " dB" << std::endl;
+                            std::cout << "→ 对应管长: " << correspondingLength << std::endl;
+                            break;
+                        }
+                    }
+                    if (!foundGain) {
+                        test_length *= 2;
+                        std::cout << "→ 长度不足，自动加倍为: " << test_length << std::endl;
                     }
                 }
-                std::cout << std::endl;
             }
         }
     }
 
-    std::cout << "警告：未找到增益 " << targetGain << " dB 的点！" << std::endl;
-    return -1;  // 未找到
+    return correspondingLength;
 }
 
-void writeDataToFile(const std::string& filename, LXjiegou jiegou, double L,jieduan LL,
+
+void writeDataToFile(const std::string& filename, LXjiegou jiegou, double L,jieduan LL,jieduan LL2,
     SaturationResult NN_1,
     SaturationResult NN_2,
     SaturationResult NN_3,
@@ -908,7 +942,10 @@ void writeDataToFile(const std::string& filename, LXjiegou jiegou, double L,jied
     outfile << "最终管长:" << L << "mm" << std::endl;
 	outfile << "一段衰减:" << LL.A << "mm--" <<LL.B<<"mm" << std::endl;
     outfile << "二段衰减:" << LL.C << "mm--" << LL.D << "mm" << std::endl;
+    outfile << "三段衰减:" << LL2.A << "mm--" << LL2.B << "mm" << std::endl;
+    outfile << "四段衰减:" << LL2.C << "mm--" << LL2.D << "mm" << std::endl;
 	outfile << "截断" << LL.B << "mm--" << LL.C << "mm" << std::endl;
+    outfile << "第二个截断" << LL2.B << "mm--" << LL2.C << "mm" << std::endl;
     outfile << std::endl;
     outfile << "# 工作频率(Hz)\t增益(dB)\t最佳输入功率(W)\t输出功率(W)" << std::endl;
 

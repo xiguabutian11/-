@@ -19,9 +19,9 @@
 #include <iostream>
 #include"DATA/data_start.h"
 #include"SeSanJieGou.h"
-#include"NEW/tube_length.h"
 #include"NEW/gongshi.h"
 #include"cal_change/find_voltage.h"
+#include"XIGUA.h"
 
 
 struct PowerResult {
@@ -60,25 +60,25 @@ struct L_YOUHUA {
 };
 
 
-PowerResult HuZuoYong(double fre, double pin, double voltage);
+PowerResult HuZuoYong(double fre, double pin, double voltage);//进行计算 并且提取计算结果中需要的数据
 
-int pout_yes(double fre, double pin, double voltage);
+int pout_yes(double fre, double pin, double voltage);//判断是否存在输出
 
-double smallpin(double guanzi_type, double L);   //返回小信号输入功率，同时更改了计算文件中的输入功率
+double smallpin(double L);   //返回小信号输入功率，同时更改了计算文件中的输入功率
 
 SaturationResult best_pin1(double fre, double V, double initialPin, double L);  //寻找固定管长下的饱和输入功率点
 
-double mag_judge(double fre, double pin, double voltage, double mag_A, double mag_period);
+double mag_judge(double fre, double pin, double voltage, double mag_A, double mag_period);//判断磁场
 
-LXjiegou voltage_YOUHUA_Brief(double startV, double& start_voltage,double& mag_A, double& mag_period);
+LXjiegou voltage_YOUHUA_Brief(double startV, double& start_voltage,double& mag_A, double& mag_period);//粗糙的 不需要在小信号
 
-LXjiegou voltage_YOUHUA(double bestV, double test_voltage, double length, double mag_A, double mag_period);
+LXjiegou voltage_YOUHUA(double bestV, double test_voltage, double length, double mag_A, double mag_period);//小信号情况下准确的电压优化
 
-L_YOUHUA L_from_Gain(double Gain1, double m, double L);   //Gain1为目标增益，m为精度大小，该函数由大信号增益确立管长
+L_YOUHUA L_from_Gain(double Gain1, double m, double L);   //Gain1为目标增益，m为精度大小，L为初始搜索管长,该函数由大信号增益确立管长
 
 double L_from_smallGain(double targetGain, double L);  //小信号增益确立管长
 
-void writeDataToFile(const std::string& filename,LXjiegou jiegou,double L, jieduan LL,
+void writeDataToFile(const std::string& filename,LXjiegou jiegou,double L, jieduan LL,jieduan LL2,
     SaturationResult NN_1,
     SaturationResult NN_2,
     SaturationResult NN_3,

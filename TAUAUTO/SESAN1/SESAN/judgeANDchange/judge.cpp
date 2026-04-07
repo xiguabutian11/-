@@ -43,8 +43,8 @@ order compare::way_1(LXsesan target, std::vector<LXsesan> guanzi)
 	if (guanzi.back().f < HZ_turn_GHZ(target.fmax*1.5)) { xunhuan.n = -1; }
 	
 
-	if (Vpcha.min_vp>target.vp / Vc+0.0025) { xunhuan.m = 1; }
-	if (Vpcha.max_vp<target.vp / Vc-0.0025) { xunhuan.m = -1; }
+	if (Vpcha.min_vp>target.vp / Vc+0.001) { xunhuan.m = 1; }
+	if (Vpcha.max_vp<target.vp / Vc-0.001) { xunhuan.m = -1; }
 	
 	if (valuemax.kc < target.kc) { xunhuan.p = -1; } 
 

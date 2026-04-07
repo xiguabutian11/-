@@ -37,7 +37,6 @@
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">_HAS_STD_BYTE=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="NEW\gongshi.cpp" />
-    <ClCompile Include="NEW\tube_length.cpp" />
     <ClCompile Include="SESAN1\SESAN\data_get\SeSan_get.cpp" />
     <ClCompile Include="SESAN1\SESAN\jisuan\Jisuan.cpp" />
     <ClCompile Include="SESAN1\SESAN\judgeANDchange\change_units.cpp" />
@@ -64,6 +63,7 @@
     <ClCompile Include="usrDataInfo\usrData.cpp" />
     <ClCompile Include="usrDataInfo\usrDataCheck.cpp" />
     <ClCompile Include="usrDataInfo\usrDataSet.cpp" />
+    <ClCompile Include="XIGUA.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="calculation\calculation.h" />
@@ -84,7 +84,6 @@
     <ClInclude Include="filesReadAndWrite\readCheck.h" />
     <ClInclude Include="lossDataProcess\lossDataProcess.h" />
     <ClInclude Include="NEW\gongshi.h" />
-    <ClInclude Include="NEW\tube_length.h" />
     <ClInclude Include="paramAndUnit\parameter.h" />
     <ClInclude Include="paramScan\paramScan.h" />
     <ClInclude Include="projManage\projManage.h" />
@@ -118,6 +117,7 @@
     <ClInclude Include="usrDataInfo\usrData.h" />
     <ClInclude Include="usrDataInfo\usrDataCheck.h" />
     <ClInclude Include="usrDataInfo\usrDataSet.h" />
+    <ClInclude Include="XIGUA.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="SESAN1\SESAN\plot.py" />
