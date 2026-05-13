@@ -39,7 +39,8 @@ class BEST {
 
 
 public:
-    double bestvoltage3(double V, double fre, double I, double Vjiange);
+
+    double bestvoltage2(double V, double fre, double I, double Vjiange);
 
     double bestfre();
 };

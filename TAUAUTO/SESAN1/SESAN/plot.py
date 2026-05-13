@@ -15,7 +15,7 @@ cpp_header_path = os.path.join(current_script_dir, "../DATA/data_start.h")
 cpp_header_path = os.path.normpath(cpp_header_path)
 
 def read_file_with_auto_encoding(file_path):
-    """自动适配编码读取文件（优先GBK，兼容UTF-8）"""
+    
     encodings = ['gbk', 'utf-8', 'gb2312', 'latin-1']
     for encoding in encodings:
         try:
@@ -26,7 +26,7 @@ def read_file_with_auto_encoding(file_path):
     raise ValueError(f"无法识别文件 {file_path} 的编码格式")
 
 def get_cpp_static_double_value(header_file, var_name):
-    """从C++头文件中读取 static double 变量的数值"""
+   
     try:
         # 1. 检查文件是否存在
         if not os.path.exists(header_file):
@@ -34,7 +34,7 @@ def get_cpp_static_double_value(header_file, var_name):
         
         # 2. 自动适配编码读取文件
         content, used_encoding = read_file_with_auto_encoding(header_file)
-        print(f"✅ 头文件编码：{used_encoding}")
+        print(f" 头文件编码：{used_encoding}")
         
         # 3. 正则匹配 static double 变量
         pattern = re.compile(
@@ -45,13 +45,13 @@ def get_cpp_static_double_value(header_file, var_name):
         
         if match:
             value = float(match.group(1))
-            print(f"✅ 成功读取 {var_name} = {value}")
+            print(f"成功读取 {var_name} = {value}")
             return value
         else:
             raise ValueError(f"未找到 static double {var_name} 的定义")
     
     except Exception as e:
-        print(f"⚠️ 读取 {var_name} 失败（使用默认值）: {e}")
+        print(f"读取 {var_name} 失败（使用默认值）: {e}")
         # 默认值匹配你头文件的数值
         return 30.0 if var_name == "Gain" else 500.0
 
@@ -152,7 +152,7 @@ except Exception as e:
 plt.tight_layout()
 output_image = os.path.join(current_script_dir, 'combined_plots.png')
 plt.savefig(output_image, dpi=300, bbox_inches='tight')
-print(f"\n📸 图片已保存: {output_image}")
+print(f"\n 图片已保存: {output_image}")
 
 plt.show()
-print("\n✅ 完成！")
+print("\n完成！")

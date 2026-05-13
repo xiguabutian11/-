@@ -29,6 +29,7 @@ order compare::way_1(LXsesan target, std::vector<LXsesan> guanzi)
 	}
 	LXsesan valuemin = fre_data(guanzi, HZ_turn_GHZ(target.fmin));   //获得最小频率点的色散数据
 	LXsesan valuemax = fre_data(guanzi, HZ_turn_GHZ(target.fmax));   //获得最大频率点的色散数据
+	LXsesan value = fre_data(guanzi, HZ_turn_GHZ(target.f));
 
 	std::cout << "左端频率色散值:" << std::endl;
 	std::cout << "频率:" << valuemin.f<<"相速："<<valuemin.vp<<"耦合阻抗："<<valuemin.kc << std::endl;
@@ -43,8 +44,8 @@ order compare::way_1(LXsesan target, std::vector<LXsesan> guanzi)
 	if (guanzi.back().f < HZ_turn_GHZ(target.fmax*1.5)) { xunhuan.n = -1; }
 	
 
-	if (Vpcha.min_vp>target.vp / Vc+0.001) { xunhuan.m = 1; }
-	if (Vpcha.max_vp<target.vp / Vc-0.001) { xunhuan.m = -1; }
+	if (value.vp >target.vp / Vc+0.0002) { xunhuan.m = 1; }
+	if (value.vp <target.vp / Vc-0.0002) { xunhuan.m = -1; }
 	
 	if (valuemax.kc < target.kc) { xunhuan.p = -1; } 
 

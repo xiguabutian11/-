@@ -1,4 +1,4 @@
-#include"TAU.h"
+#include"NEW/TIAOBIAN_youhua.h"
 #include <filesystem>
 namespace fs = std::filesystem;
 
@@ -11,6 +11,7 @@ void clearTempFolder() {
 }
 
 double guanzi_type;
+double bestV;
 
 int main(){
 	guanzi_type = 1;
@@ -61,7 +62,7 @@ int main(){
 	}
 	mag_A = mag1(V, 0.5 * r, I, 1.8);
     //========简单优化电压==========
-	double startV=liu.bestvoltage3(V, fre, I, Vjiange);
+	double startV=liu.bestvoltage2(V, fre, I, Vjiange);
 	double start_voltage = V;
 	//-------------优化电压---------------
 	LXjiegou old_jiegou = jiegou;
@@ -74,29 +75,29 @@ int main(){
 	//--------------根据管长找小信号功率---------------
 	double small_pin = smallpin(length);             
 	//--------------寻找最佳电压---------------
-	double bestV = liu.bestvoltage3(V, fre, I, Vjiange);              //实际最佳电压变量
+	bestV = liu.bestvoltage2(V, fre, I, Vjiange);              //实际最佳电压变量
 	double test_voltage = start_voltage;                              //设计目标时涉及的电压
 	V_change = V_change / 2;
 	//--------------优化电压---------------
 	old_jiegou = jiegou;
-	jiegou=voltage_YOUHUA(bestV, test_voltage, length, mag_A, mag_period);
+	jiegou=voltage_YOUHUA(test_voltage, length, mag_A, mag_period);
 	if (jiegou.Ra == 0 && jiegou.Rb == 0 && jiegou.L == 0 &&
 		jiegou.Rc == 0 && jiegou.Rg == 0 && jiegou.del == 0 &&
 		jiegou.fir == 0) {
 		jiegou = old_jiegou;
 	}
 	//--------------寻找截断对应的管长位置---------------
-	double L_cut;
-	double L_cut_2;
+	double L_cut=0;
+	double L_cut_2=0;
 	if (guanzi_type ==2) {
 		L_cut = two_point(L_from_smallGain(Gain*0.45, jiegou.L));
 		std::cout << "双段管子截断位置：" << L_cut << "mm" << std::endl;
 		if (L_cut < 20)
 		{
-			L_L.A = L_cut * 0.6;
-			L_L.B = L_cut * 0.9;
-			L_L.C = L_cut * 1.1;
-			L_L.D = L_cut * 1.4;
+			L_L.A = two_point(L_cut * 0.6);
+			L_L.B = two_point(L_cut * 0.9);
+			L_L.C = two_point(L_cut * 1.1);
+			L_L.D = two_point(L_cut * 1.4);
 		}
 		else {
 			L_L.A = L_cut - 8;
@@ -114,10 +115,10 @@ int main(){
 		std::cout << "三段管子第一处截断位置：" << L_cut << "mm" << std::endl;
 		if (L_cut < 20)
 		{
-			L_L.A = L_cut * 0.6;
-			L_L.B = L_cut * 0.9;
-			L_L.C = L_cut * 1.1;
-			L_L.D = L_cut * 1.4;
+			L_L.A = two_point(L_cut * 0.6);
+			L_L.B = two_point(L_cut * 0.9);
+			L_L.C = two_point(L_cut * 1.1);
+			L_L.D = two_point(L_cut * 1.4);
 		}
 		else {
 			L_L.A = L_cut - 8;
@@ -182,7 +183,164 @@ int main(){
 		datachange::tubeDataChange("tubeLength", LL.tubeLength);
 	}
 	
+	vector<SweepData> junyun_data = fre_sweep(sweep_point, bestV, LL);   //均匀管子的扫频数据作为参考组
+	plotWithPython(junyun_data, 0);
+	//-----------------获取电子速度为跳变做准备-----------------
 	SaturationResult NN_1 = best_pin1(fre, bestV, LL.optimalPin, LL.tubeLength);
+	vector<double>guanzi_speed = Get_speed(fre,NN_1.optimalPin,bestV); //中心频点的归一化速度曲线
+	double point_numble = guanzi_speed.size();
+	double old_L = jiegou.L;
+	double cut_percent =0;
+	if(L_cut !=0)
+	{
+		cut_percent = L_cut / LL.tubeLength;
+		if (L_cut_2 != 0) 
+		{
+			cut_percent = L_cut_2 / LL.tubeLength;
+		}
+	}
+	vector<SpeedPoint>need_speed = Speed_need(guanzi_speed, cut_percent, 8);   //提取归一化速度曲线中下降突变的部分，确认需要的点数为10
+	vector<double> score_array;
+	//-----------------根据轴向电子速度决定跳变位置，对每个跳变位置处评分-----------------
+	for (int i = 0; i < need_speed.size(); i++)
+	{
+		//==========更新跳变结构==========
+		jiegou.L = old_L * (need_speed[i].value-0.005);
+		renew_input(jiegou);
+		std::cout << "螺距更改为：" << jiegou.L*1000 << " mm" << std::endl;
+		sesan();
+
+		double tiaobian = LL.tubeLength*need_speed[i].index / point_numble;
+		updateDispJson(tiaobian);
+
+		vector<SweepData> tiaobian_data= fre_sweep(sweep_point, bestV, LL);
+		double score = tiaobian_score(junyun_data, tiaobian_data);  //评分系统
+		score_array.push_back(score);
+
+		plotWithPython(tiaobian_data, i+1);
+		revertLastDispJson();
+	}
+	//-----------------根据得分结果确定最终跳变位置-----------------
+	cout << "\n=============================================" << endl;
+	cout << "所有跳变点得分结果：" << endl;
+	for (int i = 0; i < score_array.size(); i++)
+	{
+		cout << "第 " << i << " 个点：\t" << score_array[i] << endl;
+	}
+	double max_score = score_array[0];
+	int max_index = 0;
+
+	for (int i = 1; i < score_array.size(); i++)
+	{
+		if (score_array[i] > max_score)
+		{
+			max_score = score_array[i];
+			max_index = i;
+		}
+	}
+	cout << "=============================================" << endl;
+	cout << "最高得分：\t" << max_score << endl;
+	cout << "对应位置：\t第 " << max_index << " 个点" << endl;
+	cout << "=============================================" << endl;
+	//-----------------在最终跳变位置处微调螺距-----------------
+	double old_score = max_score;
+	double tiaobian = LL.tubeLength * need_speed[max_index].index / point_numble;
+	double cut_step = 0.01 / 1000;
+	int dir = 0;
+
+	cout << "\n=============================================" << endl;
+	cout << "开始螺距微调优化（步长 = " << cut_step << "）" << endl;
+	cout << "=============================================" << endl;
+
+	// 先正向试探
+	jiegou.L = old_L * (need_speed[max_index].value - 0.005);
+	jiegou.L += cut_step;
+	renew_input(jiegou);
+	std::cout << "螺距更改为：" << jiegou.L * 1000 << " mm" << std::endl;
+	sesan();
+	updateDispJson(tiaobian);
+	vector<SweepData> data_pos = fre_sweep(sweep_point, bestV, LL);
+	plotWithPython(data_pos, need_speed.size() + 1);
+	double score_pos = tiaobian_score(junyun_data, data_pos);
+	revertLastDispJson();
+	cout << "→ 正向试探得分：" << score_pos << "  |  基准得分：" << old_score << endl;
+
+	if (score_pos > old_score)
+	{
+		cout << "正向更优，确定方向：增大螺距" << endl;
+		dir = 1;
+	}
+	else
+	{
+		cout << "正向无提升，开始反向试探" << endl;
+
+		jiegou.L -= cut_step;
+		jiegou.L -= cut_step;
+		renew_input(jiegou);
+		std::cout << "螺距更改为：" << jiegou.L * 1000 << " mm" << std::endl;
+		sesan();
+		updateDispJson(tiaobian);
+		vector<SweepData> data_neg = fre_sweep(sweep_point, bestV, LL);
+		plotWithPython(data_neg, need_speed.size() + 2);
+		double score_neg = tiaobian_score(junyun_data, data_neg);
+		revertLastDispJson();
+		cout << "→ 反向试探得分：" << score_neg << "  |  基准得分：" << old_score << endl;
+
+		if (score_neg > old_score)
+		{
+			cout << "反向更优，确定方向：减小螺距" << endl;
+			dir = -1;
+		}
+		else
+		{
+			cout << "正反方向均无提升，不进行优化，恢复原始长度" << endl;
+			jiegou.L += cut_step;
+		}
+	}
+
+	// 迭代优化
+	while (dir != 0)
+	{
+		cout << "\n→ 沿方向 " << dir << " 继续优化..." << endl;
+
+		jiegou.L += dir * cut_step;
+		renew_input(jiegou);
+		std::cout << "螺距更改为：" << jiegou.L * 1000 << " mm" << std::endl;
+		sesan();
+		updateDispJson(tiaobian);
+		vector<SweepData> cur_data = fre_sweep(sweep_point, bestV, LL);
+		plotWithPython(cur_data, need_speed.size() + 3);
+		double cur_score = tiaobian_score(junyun_data, cur_data);
+		revertLastDispJson();
+		cout << "→ 当前得分：" << cur_score << "  |  历史最优：" << old_score << endl;
+
+		if (cur_score <= old_score)
+		{
+			cout << "得分不再提升，回退到最优位置并停止优化" << endl;
+			jiegou.L -= dir * cut_step;
+			break;
+		}
+
+		old_score = cur_score;
+		cout << "得分提升，继续迭代" << endl;
+	}
+
+	cout << "\n=============================================" << endl;
+	cout << "螺距优化全部完成，最终长度：" << jiegou.L << endl;
+	cout << "开始绘制最终优化结果" << endl;
+	cout << "=============================================\n" << endl;
+
+	renew_input(jiegou);
+	sesan();
+	updateDispJson(tiaobian);
+	vector<SweepData> cur_data = fre_sweep(sweep_point, bestV, LL);
+	plotWithPython(cur_data, need_speed.size() + 4);
+	revertLastDispJson();
+	exit(EXIT_FAILURE);
+
+
+
+
 	SaturationResult NN_2 = best_pin1(minfre, bestV, LL.optimalPin, LL.tubeLength);
 	SaturationResult NN_3 = best_pin1(maxfre, bestV, LL.optimalPin, LL.tubeLength);
 
@@ -242,4 +400,4 @@ int main(){
 	system(("python " + TAUAUTO_PATH + "/plot.py").c_str());
   }
 
-  //西瓜不甜
+ 

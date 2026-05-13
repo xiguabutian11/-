@@ -228,6 +228,9 @@
     <ClCompile Include="XIGUA.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="NEW\TIAOBIAN_youhua.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="constData\structDefine.h">
@@ -386,8 +389,16 @@
     <ClInclude Include="XIGUA.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="json.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="NEW\TIAOBIAN_youhua.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="SESAN1\SESAN\plot.py" />
+    <None Include="SESAN1\SESAN\plot_sweep.py" />
+    <None Include="SESAN1\SESAN\plot_all.py" />
   </ItemGroup>
 </Project>

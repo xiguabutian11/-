@@ -16,10 +16,13 @@
 #include <unordered_map>
 #include <iostream>
 #include "SESAN1/DATA/data_start.h"
+#include "XIGUA.h"
 
 class datachange {
 public:
 	static bool changecalsetting(const std::string& targetParam, double numble);
+
+	static bool changecalsetting_array(const std::string& targetParam, const std::vector<double>& numArray);
 
 	static bool tubeDataChange(const std::string& fieldName, double newValue);
 

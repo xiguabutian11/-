@@ -2,7 +2,7 @@
 
 
 using namespace std;
-
+using json = nlohmann::json;
 
 
 PowerResult HuZuoYong(double fre, double pin, double voltage)
@@ -164,6 +164,154 @@ PowerResult HuZuoYong(double fre, double pin, double voltage)
     }
 
     return result;
+}
+
+vector<PowerResult> Many_HuZuoYong(std::vector<double> freList, std::vector<double> pinList, double voltage)
+{
+    std::vector<PowerResult> allResult;
+    if (freList.size() != pinList.size())
+    {
+		std::cout <<  "频率列表和输入功率列表长度不匹配" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+   
+    datachange::changecalsetting_array("frequency", freList);
+    datachange::changecalsetting_array("pin", pinList);
+    datachange::changecalsetting("v1", voltage);
+
+    filesystem::path projectPath = Projectpath;
+    usrData& data = usrData::getInstance();
+
+  
+    if (!projManage::openProj(projectPath.string()))
+    {
+        for (auto& msg : data.curCalGroup.message)
+        {
+            std::cerr << msg.str << std::endl;
+        }
+        return allResult;
+    }
+    calculation::seqCalculate();
+    calculation::waitForAllTasks();
+
+ 
+    for (auto& seq : data.curCalGroup.res.reses)
+    {
+        
+        std::vector<decltype(seq.second)::value_type> temp_list;
+        for (auto& res : seq.second) {
+            temp_list.push_back(res);
+        }
+
+        std::sort(temp_list.begin(), temp_list.end(), [](const auto& a, const auto& b) {
+            return a.freqy.freq < b.freqy.freq;
+            });
+
+        for (auto& res : temp_list)
+        {
+            PowerResult result{ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+            double curFre = res.freqy.freq;
+            double curPin = res.freqy.pin;
+
+            if (!res.result.Pout.empty())
+            {
+                const auto& poutArray = res.result.Pout[0];
+                result.totalPoints = poutArray.size();
+
+                if (result.totalPoints > 0)
+                {
+                    double threshold = 0.0;
+                    if (guanzi_type == 1)
+                    {
+                        threshold = curPin * pow(10, 5 / 10.0);
+                    }
+                    else if (guanzi_type == 2)
+                    {
+                        threshold = curPin * pow(10, two_point(Gain * 0.45) / 10.0);
+                    }
+                    else if (guanzi_type == 3)
+                    {
+                        threshold = curPin * pow(10, two_point(Gain * 0.65) / 10.0);
+                    }
+
+                    int targetPeakPointIdx = -1;
+                    double targetPeakPower = 0.0;
+                    for (int i = 0; i < result.totalPoints; i++)
+                    {
+                        bool isPeak = false;
+                        double currentPower = poutArray[i];
+
+                        if (i > 0 && i < result.totalPoints - 1)
+                        {
+                            bool basicPeak = (currentPower > poutArray[i - 1]) && (currentPower >= poutArray[i + 1]);
+                            if (basicPeak)
+                            {
+                                int j = i + 1;
+                                while (j < result.totalPoints && poutArray[j] == currentPower)
+                                {
+                                    j++;
+                                }
+                                if (j >= result.totalPoints || poutArray[j] < currentPower)
+                                {
+                                    isPeak = true;
+                                }
+                            }
+                        }
+                        else if (i == result.totalPoints - 1 && result.totalPoints > 1)
+                        {
+                            isPeak = (currentPower > poutArray[i - 1]);
+                        }
+                        else if (result.totalPoints == 1)
+                        {
+                            isPeak = true;
+                        }
+
+                        if (isPeak && currentPower > threshold)
+                        {
+                            targetPeakPointIdx = i;
+                            targetPeakPower = currentPower;
+                            break;
+                        }
+                    }
+
+                    if (targetPeakPointIdx == -1)
+                    {
+                        targetPeakPointIdx = result.totalPoints - 1;
+                        targetPeakPower = poutArray[targetPeakPointIdx];
+                    }
+
+                    auto globalMaxIt = std::max_element(poutArray.begin(), poutArray.end());
+                    double globalMaxPower = *globalMaxIt;
+                    int globalMaxPointIdx = std::distance(poutArray.begin(), globalMaxIt);
+
+                    double valleyPower = 0.0;
+                    int valleyPointIdx = -1;
+                    if (globalMaxPointIdx != targetPeakPointIdx)
+                    {
+                        int startIdx = std::min(globalMaxPointIdx, targetPeakPointIdx);
+                        int endIdx = std::max(globalMaxPointIdx, targetPeakPointIdx);
+                        auto valleyIt = std::min_element(poutArray.begin() + startIdx, poutArray.begin() + endIdx + 1);
+                        valleyPower = *valleyIt;
+                        valleyPointIdx = std::distance(poutArray.begin(), valleyIt);
+                    }
+
+                    result.targetPeakPower = targetPeakPower;
+                    result.targetPeakPoint = targetPeakPointIdx + 1;
+                    result.globalMaxPower = globalMaxPower;
+                    result.globalMaxPoint = globalMaxPointIdx + 1;
+                    result.valleyPower = valleyPower;
+                    result.valleyPoint = (valleyPointIdx == -1) ? 0 : (valleyPointIdx + 1);
+
+                    int midPoint = result.totalPoints / 2;
+                    result.midOutputPower = poutArray[midPoint];
+                    result.endOutputPower = poutArray.back();
+                }
+                allResult.push_back(result);
+            }
+        }
+    }
+
+    return allResult;
 }
 
 int pout_yes(double fre, double pin, double voltage)
@@ -334,7 +482,7 @@ SaturationResult best_pin1(double fre, double V, double initialPin, double L)
         int currentMaxPoint = powerInfo.targetPeakPoint;
         totalPoints = powerInfo.totalPoints;
 
-        // ===================== 【新增：增益超限判断】 =====================
+
         // 计算当前增益：全局最大输出功率 / 当前输入功率
         double currentGain = 10 * log10(powerInfo.globalMaxPower / currentPin);
 
@@ -453,6 +601,218 @@ SaturationResult best_pin1(double fre, double V, double initialPin, double L)
         currentPin, 0, 0, 0, 0,0, 0
     };
 }
+
+vector<SaturationResult> best_pin2(vector<double> freList, double V, double initialPin, double L)
+{
+    vector<SaturationResult> finalResults;
+    vector<double> currentFre = freList;
+    vector<double> currentPin;
+    vector<double> step_up;
+    vector<double> step_down;
+    vector<int> lastDirection;
+    vector<bool> isFinished;
+
+    double Gainmax = 25;
+    if (Gain > 20 && Gain < 45)
+    {
+        Gainmax = 50;
+    }
+    else if (Gain < 70)
+    {
+        Gainmax = 75;
+    }
+
+    datachange::tubeDataChange("tubeLength", 2 * L);
+
+    int freqCount = currentFre.size();
+    for (int i = 0; i < freqCount; i++)
+    {
+        currentPin.push_back(initialPin);
+        step_up.push_back(initialPin);
+        step_down.push_back(initialPin);
+        lastDirection.push_back(0);
+        isFinished.push_back(false);
+    }
+
+    const int maxIterations = 50;
+    cout << "=== 多频点并行寻优 ===" << endl;
+
+    for (int iter = 0; iter < maxIterations; iter++)
+    {
+        bool allDone = true;
+        for (bool d : isFinished) {
+            if (!d) { allDone = false; break; }
+        }
+        if (allDone) break;
+
+        vector<PowerResult> powerInfos = Many_HuZuoYong(currentFre, currentPin, V);
+        if (powerInfos.size() != currentFre.size()) continue;
+
+        vector<double> newFre;
+        vector<double> newPin;
+        vector<double> newStepUp;
+        vector<double> newStepDown;
+        vector<int> newDir;
+        vector<bool> newFinish;
+
+        for (int i = 0; i < currentFre.size(); i++)
+        {
+            double f = currentFre[i];
+            double p = currentPin[i];
+            PowerResult info = powerInfos[i];
+            int peakPoint = info.targetPeakPoint;
+            int totalP = info.totalPoints;
+
+            int tMin, tMax;
+            if (info.valleyPower > 1e-10)
+            {
+                if (info.valleyPower >= info.targetPeakPower * 0.9)
+                {
+                    double k = info.globalMaxPoint - info.targetPeakPoint;
+                    tMin = totalP / 2 - k;
+                    tMax = totalP / 2 + k;
+                }
+                else
+                {
+                    tMin = totalP / 2 - 2;
+                    tMax = totalP / 2 + 2;
+                }
+            }
+            else
+            {
+                tMin = totalP / 2 - 2;
+                tMax = totalP / 2 + 2;
+            }
+
+            cout << "[迭代 " << iter + 1 << "] 频率: " << f
+                << " | pin: " << p
+                << " | 饱和点: " << peakPoint << "/" << totalP
+                << " | 饱和值: " << info.targetPeakPower
+                << " | 目标区间: [" << tMin << ", " << tMax << "]" << endl;
+
+            double curGain = 10 * log10(info.globalMaxPower / p);
+            bool isDecreasing = (lastDirection[i] == -1);
+            if (isDecreasing && curGain > Gainmax)
+            {
+                cout << "   → 增益超上限，保存" << endl;
+                double limitPout = p * pow(10, Gainmax / 10.0);
+
+                // 频率去重：已存在则不再存入
+                bool hasExist = false;
+                for (auto& item : finalResults)
+                {
+                    if (fabs(item.workfre - f) < 1e-6)
+                    {
+                        hasExist = true;
+                        break;
+                    }
+                }
+                if (!hasExist)
+                {
+                    finalResults.push_back({ p, limitPout, info.midOutputPower, 0.0, f, peakPoint, totalP });
+                }
+
+                newFre.push_back(f);
+                newPin.push_back(p);
+                newStepUp.push_back(step_up[i]);
+                newStepDown.push_back(step_down[i]);
+                newDir.push_back(lastDirection[i]);
+                newFinish.push_back(true);
+                continue;
+            }
+
+            if (peakPoint >= tMin && peakPoint <= tMax)
+            {
+                cout << "   → 已达标，保存" << endl;
+                double overSat = 0.0;
+                if (info.targetPeakPower > info.midOutputPower)
+                    overSat = (info.targetPeakPower - info.midOutputPower) / info.targetPeakPower;
+
+                // 频率去重：已存在则不再存入
+                bool hasExist = false;
+                for (auto& item : finalResults)
+                {
+                    if (fabs(item.workfre - f) < 1e-6)
+                    {
+                        hasExist = true;
+                        break;
+                    }
+                }
+                if (!hasExist)
+                {
+                    finalResults.push_back({ p, info.targetPeakPower, info.midOutputPower, overSat, f, peakPoint, totalP });
+                }
+
+                newFre.push_back(f);
+                newPin.push_back(p);
+                newStepUp.push_back(step_up[i]);
+                newStepDown.push_back(step_down[i]);
+                newDir.push_back(lastDirection[i]);
+                newFinish.push_back(true);
+                continue;
+            }
+
+            double newP = p;
+            int newDirVal = 0;
+
+            if (peakPoint > tMax)
+            {
+                cout << "   → 饱和点偏后，增大功率" << endl;
+                if (lastDirection[i] == -1)
+                {
+                    step_down[i] /= 2;
+                    step_up[i] /= 2;
+                    newP = p + step_down[i];
+                }
+                else
+                {
+                    newP += step_up[i];
+                    newDirVal = 1;
+                }
+            }
+            else if (peakPoint < tMin)
+            {
+                cout << "   → 饱和点偏前，减小功率" << endl;
+                if (lastDirection[i] == 1)
+                {
+                    step_up[i] /= 2;
+                    step_down[i] /= 2;
+                    newP = p - step_up[i];
+                }
+                else
+                {
+                    step_up[i] /= 2;
+                    step_down[i] /= 2;
+                    newP -= step_down[i];
+                    newDirVal = -1;
+                }
+            }
+
+            if (newP < 1e-10) newP = 1e-10;
+            cout << "   → 新功率: " << newP << endl;
+
+            newFre.push_back(f);
+            newPin.push_back(newP);
+            newStepUp.push_back(step_up[i]);
+            newStepDown.push_back(step_down[i]);
+            newDir.push_back(newDirVal);
+            newFinish.push_back(false);
+        }
+
+        currentFre = newFre;
+        currentPin = newPin;
+        step_up = newStepUp;
+        step_down = newStepDown;
+        lastDirection = newDir;
+        isFinished = newFinish;
+    }
+
+    datachange::tubeDataChange("tubeLength", L);
+    cout << "\n=== 全部完成 ===" << endl;
+    return finalResults;
+}
+
+
 double mag_judge(double fre, double pin, double voltage,double mag_A,double mag_period) {
     // 保存当前的cout格式状态
     std::ios_base::fmtflags original_flags = std::cout.flags();
@@ -610,7 +970,7 @@ LXjiegou voltage_YOUHUA_Brief(double startV, double& start_voltage,
             }
             mag_A = mag1(V, 0.5 * r, I, 1.8);
             //----------------------------------
-            startV = liu.bestvoltage3(V, fre, I, Vjiange);//寻找最佳电压
+            startV = liu.bestvoltage2(V, fre, I, Vjiange);//寻找最佳电压
             F = -1;
         }
         else if (startV > V + 500)
@@ -635,14 +995,14 @@ LXjiegou voltage_YOUHUA_Brief(double startV, double& start_voltage,
             }
             mag_A = mag1(V, 0.5 * r, I, 1.8);
             //----------------------------------
-            startV = liu.bestvoltage3(V, fre, I, Vjiange);
+            startV = liu.bestvoltage2(V, fre, I, Vjiange);
             F = 1;
         }
     }
     return jiegou;
 };
 
-LXjiegou voltage_YOUHUA(double bestV, double test_voltage,double length,double mag_A,double mag_period) {
+LXjiegou voltage_YOUHUA( double test_voltage,double length,double mag_A,double mag_period) {
     double F = 0;
     double r = 0;
     double small_pin = 0;
@@ -675,7 +1035,7 @@ LXjiegou voltage_YOUHUA(double bestV, double test_voltage,double length,double m
             }
             mag_A = mag1(V, 0.5 * r, I, 1.8);
             //----------------------------------
-            bestV = liu.bestvoltage3(V, fre, I, Vjiange);//寻找最佳电压
+            bestV = liu.bestvoltage2(V, fre, I, Vjiange);//寻找最佳电压
             F = -1;
         }
         else if (bestV > V + Vcha)
@@ -700,7 +1060,7 @@ LXjiegou voltage_YOUHUA(double bestV, double test_voltage,double length,double m
             }
             mag_A = mag1(V, 0.5 * r, I, 1.8);
             //----------------------------------
-            bestV = liu.bestvoltage3(V, fre, I, Vjiange);
+            bestV = liu.bestvoltage2(V, fre, I, Vjiange);
             F = 1;
         }
     }
@@ -832,9 +1192,9 @@ L_YOUHUA L_from_Gain(double Gain1, double m, double L)  // 仅新增Pout_const�
         }
         std::cout << "增益" << now_Gain << "对应管长" << correspondingLength << "目标极大值功率" << maxpout << std::endl;
         liu1.gain = now_Gain;
-        liu1.tubeLength = correspondingLength;
+        liu1.tubeLength = two_point(correspondingLength);
         liu1.maxPout = maxpout;  // 存储目标极大值点功率
-        liu1.optimalPin = test_pin;
+        liu1.optimalPin = four_point(test_pin);
     };
 
     return liu1;
@@ -989,3 +1349,98 @@ void writeDataToFile(const std::string& filename, LXjiegou jiegou, double L,jied
 }
 
 
+
+
+
+void updateDispJson(double newPointZ)
+{
+    // 1. 读取 output.txt 色散数据
+    vector<LXsesan> data = readTWTData(outputPath);
+
+    // 2. 提取指定频段 [minfre, maxfre]
+    vector<double> freq, vp, kc, alpha;
+    for (auto& d : data) {
+        if (d.f >= minfre-1 && d.f <= maxfre+1) {
+            freq.push_back(d.f);
+            vp.push_back(d.vp);
+            kc.push_back(d.kc);
+            alpha.push_back(d.alpha);
+        }
+    }
+
+    // 3. 读取原 JSON
+    ifstream fin(dispdatapath);
+    json j;
+    fin >> j;
+    fin.close();
+
+    // ====================== 4. 新增色散段 position_N ======================
+    int newIdx = j["dispGroup"].size() + 1;
+    string newName = "position_" + to_string(newIdx);
+
+    json newDisp;
+    newDisp["name"] = newName;
+    newDisp["fileType"] = "TXT";
+    newDisp["skipHeader"] = 1;
+    newDisp["path"] = newName;
+    newDisp["vp"]["freq"] = freq;
+    newDisp["vp"]["val"] = vp;
+    newDisp["kc"]["freq"] = freq;
+    newDisp["kc"]["val"] = kc;
+    newDisp["alpha"]["freq"] = freq;
+    newDisp["alpha"]["val"] = alpha;
+
+    j["dispGroup"].push_back(newDisp);
+
+    // ====================== 5. 核心：【在最后面追加】一个 type=0 ======================
+    json newPoint;
+    newPoint["dispKey"] = newName;    
+    newPoint["interpoType"] = 0;     
+    newPoint["point"] = newPointZ;    
+
+    j["samplePoints"].push_back(newPoint);
+
+    // ====================== 6. 保存JSON ======================
+    ofstream fout(dispdatapath);
+    fout << j.dump(4);
+    fout.close();
+
+    cout << "拓展完成" << newName << endl;
+}
+
+
+void revertLastDispJson()
+{
+
+    ifstream fin(dispdatapath);
+    if (!fin.is_open()) {
+        cout << "打开 JSON 文件失败！" << endl;
+        return;
+    }
+
+    json j;
+    fin >> j;
+    fin.close();
+
+
+    if (j["dispGroup"].empty() || j["samplePoints"].empty()) {
+        cout << "已经是初始状态，无需还原！" << endl;
+        return;
+    }
+
+
+    string deletedName = j["dispGroup"].back()["name"];
+
+
+    j["dispGroup"].erase(j["dispGroup"].end() - 1);
+
+
+    j["samplePoints"].erase(j["samplePoints"].end() - 1);
+
+
+    ofstream fout(dispdatapath);
+    fout << j.dump(4);
+    fout.close();
+
+    cout << "已成功还原！删除：" << deletedName << " 和对应采样点" << endl;
+}

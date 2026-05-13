@@ -1,23 +1,23 @@
 
-a - internal radius of helix, 3.914706
-b-externa radius of helix, 5.26752
-L-helix pitch, 5.397351
-c-wall radius, 15.782824
-g-radius of load, 7.507316
-del- helix width, 1.619205
+a - internal radius of helix, 1.063535
+b-externa radius of helix, 1.409449
+L-helix pitch, 1.346769
+c-wall radius, 4.035668
+g-radius of load, 2.110249
+del- helix width, 0.42853
 eps, 3.8
-ratio, 1.0
-fir,95
+ratio, 1
+fir,60
 correction factor, 1.0
 number of loads, 3
 m-number of points for description rods, 6
 coordinats of points(m*3 value)
-0.000000	5.267520	0.000000
-1.000829	5.267520	0.000000
-1.000829	11.576702	0.000000
-2.317709	11.576702	0.000000
-2.317709	15.782824	0.000000
-0.000000	15.782824	0.000000
+0.000000	1.409449	0.000000
+0.267795	1.409449	0.000000
+0.267795	2.985180	0.000000
+0.620158	2.985180	0.000000
+0.620158	4.035668	0.000000
+0.000000	4.035668	0.000000
 
 
 

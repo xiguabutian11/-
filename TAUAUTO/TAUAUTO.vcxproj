@@ -37,6 +37,7 @@
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">_HAS_STD_BYTE=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="NEW\gongshi.cpp" />
+    <ClCompile Include="NEW\TIAOBIAN_youhua.cpp" />
     <ClCompile Include="SESAN1\SESAN\data_get\SeSan_get.cpp" />
     <ClCompile Include="SESAN1\SESAN\jisuan\Jisuan.cpp" />
     <ClCompile Include="SESAN1\SESAN\judgeANDchange\change_units.cpp" />
@@ -82,8 +83,10 @@
     <ClInclude Include="filesReadAndWrite\fileReading.h" />
     <ClInclude Include="filesReadAndWrite\fileWriting.h" />
     <ClInclude Include="filesReadAndWrite\readCheck.h" />
+    <ClInclude Include="json.hpp" />
     <ClInclude Include="lossDataProcess\lossDataProcess.h" />
     <ClInclude Include="NEW\gongshi.h" />
+    <ClInclude Include="NEW\TIAOBIAN_youhua.h" />
     <ClInclude Include="paramAndUnit\parameter.h" />
     <ClInclude Include="paramScan\paramScan.h" />
     <ClInclude Include="projManage\projManage.h" />
@@ -120,6 +123,8 @@
     <ClInclude Include="XIGUA.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="SESAN1\SESAN\plot_all.py" />
+    <None Include="SESAN1\SESAN\plot_sweep.py" />
     <None Include="SESAN1\SESAN\plot.py" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

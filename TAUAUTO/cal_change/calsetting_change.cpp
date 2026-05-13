@@ -3,47 +3,73 @@
 
 bool datachange::changecalsetting(const std::string& targetParam, double numble) {
     calSetting calSet;
-    // 1. 读取配置文件
+
     if (!fileReading::calSetRead(calSet, jsonPath)) {
         std::cerr << "读取配置文件失败" << std::endl;
-        return false; // 明确返回
+        return false;
     }
 
-    // 2. 检查参数是否存在
     if (calSet.calSet.find("sequence_1") == calSet.calSet.end() ||
         calSet.calSet["sequence_1"].seq.find(targetParam) == calSet.calSet["sequence_1"].seq.end()) {
         std::cerr << "未找到参数: " << targetParam << std::endl;
-        return false; // 明确返回
+        return false;
     }
 
-    // 3. 修改参数值
-    calSet.calSet["sequence_1"].seq[targetParam].array = { numble };
+    double val = four_point(numble);
+    calSet.calSet["sequence_1"].seq[targetParam].array = { val };
 
-    // 4. 写回文件
     if (!fileWriting::calSetWrite(calSet, jsonPath)) {
-        std::cerr << "保存配置失败: " << numble << std::endl;
-        return false; // 明确返回
+        std::cerr << "保存配置失败" << std::endl;
+        return false;
     }
 
-    return true; // 所有操作成功
+    return true;
 }
 
 
+bool datachange::changecalsetting_array(const std::string& targetParam, const std::vector<double>& numArray)
+{
+    calSetting calSet;
 
+    if (!fileReading::calSetRead(calSet, jsonPath)) {
+        std::cerr << "读取配置文件失败" << std::endl;
+        return false;
+    }
+
+    if (calSet.calSet.find("sequence_1") == calSet.calSet.end() ||
+        calSet.calSet["sequence_1"].seq.find(targetParam) == calSet.calSet["sequence_1"].seq.end()) {
+        std::cerr << "未找到参数: " << targetParam << std::endl;
+        return false;
+    }
+
+    std::vector<double> out;
+    for (double d : numArray) {
+        out.push_back(four_point(d));
+    }
+
+    calSet.calSet["sequence_1"].seq[targetParam].array = out;
+
+    if (!fileWriting::calSetWrite(calSet, jsonPath)) {
+        std::cerr << "保存配置失败" << std::endl;
+        return false;
+    }
+
+    return true;
+}
 
 
 bool datachange::tubeDataChange(const std::string& fieldName,double newValue) {
-    // 1. 读取 JSON 文件
+
     
     std::ifstream inFile(tubeDataPath);
     Json::Value root;
     inFile >> root; // 直接解析（省略错误处理）
     inFile.close();
 
-    // 2. 修改目标字段
+
     root[fieldName] = newValue;
 
-    // 3. 写回文件
+
     std::ofstream outFile(tubeDataPath);
     outFile << root; // 直接输出（保持原格式）
     outFile.close();

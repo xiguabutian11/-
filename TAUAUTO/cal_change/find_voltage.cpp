@@ -1,117 +1,78 @@
 #include "find_voltage.h"
 
-
-
-double BEST::bestvoltage3(double V, double fre, double I, double Vjiange) {
+double BEST::bestvoltage2(double V, double fre, double I, double Vjiange) {
 
     datachange::changecalsetting("i", I);
     datachange::changecalsetting("frequency", fre);
 
-    // 分段定义电压范围和步长
-    double lowV1 = V - 400;          // 第一段下限：V-300
-    double highV1 = V + 400;         // 第一段上限：V+300
-    double step1 = 50;               // 第一段固定步长50
+    // 分段生成电压序列
+    double lowV1 = V - 400;
+    double highV1 = V + 400;
+    double step1 = 50;
 
-    double lowV2 = highV1;           // 第二段下限：V+300
-    double highV2 = V + 5000;        // 第二段上限：V+5000
-    double step2 = (highV2 - lowV2) / Vjiange;  // 第二段步长
+    double lowV2 = highV1;
+    double highV2 = V + 5000;
+    double step2 = (highV2 - lowV2) / Vjiange;
 
-    // 存储所有结果的容器
+    // 组装完整电压数组
+    std::vector<double> voltageList;
+    for (double voltage = lowV1; voltage <= highV1; voltage += step1)
+    {
+        voltageList.push_back(voltage);
+    }
+    for (double voltage = lowV2 + step2; voltage <= highV2; voltage += step2)
+    {
+        voltageList.push_back(voltage);
+    }
+
+    // 一次性写入电压数组 批量扫参
+    datachange::changecalsetting_array("v1", voltageList);
+
+    filesystem::path projectPath = Projectpath;
+    usrData& data = usrData::getInstance();
+
+    if (!projManage::openProj(projectPath.string())) {
+        for (auto& msg : data.curCalGroup.message) {
+            std::cerr << msg.str << std::endl;
+        }
+        return V;
+    }
+
+    // 只计算一次 批量出所有扫参结果
+    calculation::seqCalculate();
+    calculation::waitForAllTasks();
+
     std::vector<SimulationResult> firstResults;
-    std::vector<SimulationResult> BestPoints;
 
-    // ===================== 第一段循环：V-300 到 V+300，步长50 =====================
-    for (double voltage = lowV1; voltage <= highV1; voltage += step1)             //电压扫描
-    {
-        std::cout << "扫描电压范围" << lowV1 << "V-" << highV1 << "V" << std::endl;
-        datachange::changecalsetting("v1", voltage);   //修改calsetting中的电压参数
-        std::cout << "扫描电压: " << voltage << " V..." << std::endl;        //产生电压序列，上下限200步长
-        double M1 = Me * Vc * Vc / (Me * Vc * Vc + voltage * e);
-        double Ve = Vc * std::pow((1 - M1 * M1), 0.5);
+    // 读取结果：从 res.params["v1"] 取真实绑定电压，杜绝顺序错乱
+    for (auto& seq : data.curCalGroup.res.reses) {
+        for (auto& res : seq.second) {
+            SimulationResult result;
+            // 关键：取当前结果绑定的真实v1，不依赖遍历顺序
+            result.voltage = res.params["v1"];
+            result.frequency = res.freqy.freq;
+            result.inputPower = res.freqy.pin;
 
-        //-------------------------计算代码-----------------------
-        filesystem::path projectPath = Projectpath;
-        usrData& data = usrData::getInstance();
-
-        if (!projManage::openProj(projectPath.string())) {
-            for (auto& msg : data.curCalGroup.message) {
-                std::cerr << msg.str << std::endl;
+            if (!res.result.Pout.empty() && !res.result.Pout[0].empty()) {
+                result.outputPower = res.result.Pout[0].back();
+                result.avg = 10 * log10(result.outputPower / result.inputPower);
             }
-            continue;
-        }
-
-        calculation::seqCalculate();
-        calculation::waitForAllTasks();
-        // ===================== 将计算结果进行处理并保存到结构体result中 =====================
-        for (auto& seq : data.curCalGroup.res.reses) {
-            for (auto& res : seq.second) {
-                SimulationResult result;
-                result.voltage = voltage;                           //电压
-                result.frequency = res.freqy.freq;                 //频率
-                result.inputPower = res.freqy.pin;                 //输入功率
-
-                if (!res.result.Pout.empty()) {
-                    result.outputPower = res.result.Pout[0].back();                     //输出功率
-                    std::cout << res.freqy.freq << std::endl;
-                }
-                else {
-                    result.outputPower = -1; // 标记无效结果
-                }
-                result.avg = 10 * log10(result.outputPower / result.inputPower);                  //增益
-                firstResults.push_back(result);
-
+            else {
+                result.outputPower = -1;
+                result.avg = -1;
             }
+            firstResults.push_back(result);
         }
-
     }
 
-    // ===================== 第二段循环：V+300 到 V+5000，步长jiange =====================
-    for (double voltage = lowV2 + step2; voltage <= highV2; voltage += step2)  // 避免重复处理V+300
-    {
-        std::cout << "扫描电压范围" << lowV2 << "V-" << highV2 << "V" << std::endl;
-        datachange::changecalsetting("v1", voltage);   //修改calsetting中的电压参数
-        std::cout << "扫描电压: " << voltage << " V..." << std::endl;        //产生电压序列，上下限200步长
-        double M1 = Me * Vc * Vc / (Me * Vc * Vc + voltage * e);
-        double Ve = Vc * std::pow((1 - M1 * M1), 0.5);
+    // ========== 新增：按电压 从小到大 排序 ==========
+    std::sort(firstResults.begin(), firstResults.end(),
+        [](const SimulationResult& a, const SimulationResult& b) {
+            return a.voltage < b.voltage;
+        });
 
-        //-------------------------计算代码-----------------------
-        filesystem::path projectPath = Projectpath;
-        usrData& data = usrData::getInstance();
-
-        if (!projManage::openProj(projectPath.string())) {
-            for (auto& msg : data.curCalGroup.message) {
-                std::cerr << msg.str << std::endl;
-            }
-            continue;
-        }
-
-        calculation::seqCalculate();
-        calculation::waitForAllTasks();
-        // ===================== 将计算结果进行处理并保存到结构体result中 =====================
-        for (auto& seq : data.curCalGroup.res.reses) {
-            for (auto& res : seq.second) {
-                SimulationResult result;
-                result.voltage = voltage;                           //电压
-                result.frequency = res.freqy.freq;                 //频率
-                result.inputPower = res.freqy.pin;                 //输入功率
-
-                if (!res.result.Pout.empty()) {
-                    result.outputPower = res.result.Pout[0].back();                     //输出功率
-                    std::cout << res.freqy.freq << std::endl;
-                }
-                else {
-                    result.outputPower = -1; // 标记无效结果
-                }
-                result.avg = 10 * log10(result.outputPower / result.inputPower);                  //增益
-                firstResults.push_back(result);
-
-            }
-        }
-
-    }
-
-    /*===================== 输出 =====================*/
-    std::cout << "\n\n=============== 扫压结果 ===============" << std::endl;
+    /*===================== 有序输出 =====================*/
+    std::cout << "\n\n=============== 扫压结果（按电压升序）===============" << std::endl;
     std::cout << std::left << std::setw(10) << "电压(V)"
         << std::setw(12) << "频率(GHz)"
         << std::setw(12) << "输入功率(W)"
@@ -121,9 +82,7 @@ double BEST::bestvoltage3(double V, double fre, double I, double Vjiange) {
     std::cout << "----------------------------------------" << std::endl;
 
     for (const auto& result : firstResults) {
-        // 只输出有效结果（outputPower >= 0）
         if (result.outputPower >= 0) {
-
             std::cout << std::left << std::setw(10) << result.voltage
                 << std::setw(12) << result.frequency
                 << std::setw(12) << result.inputPower
@@ -133,13 +92,12 @@ double BEST::bestvoltage3(double V, double fre, double I, double Vjiange) {
         }
     }
 
-
+    std::vector<SimulationResult> BestPoints;
     if (!firstResults.empty()) {
         auto bestIt = max_element(firstResults.begin(), firstResults.end(),
             [](const auto& a, const auto& b) { return a.outputPower < b.outputPower; });
 
-        BestPoints.push_back(*bestIt);  // BestPoints里面保存了每个电压的评估参数
-
+        BestPoints.push_back(*bestIt);
     }
 
     cout << "\n============== 输出功率最大的电压 ==============" << endl;
@@ -151,6 +109,7 @@ double BEST::bestvoltage3(double V, double fre, double I, double Vjiange) {
         << endl;
     cout << "------------------------------------------------" << endl;
 
+    double bestV = V;
     for (const auto& point : BestPoints) {
         cout << setw(10) << point.voltage
             << setw(12) << point.frequency
@@ -159,11 +118,10 @@ double BEST::bestvoltage3(double V, double fre, double I, double Vjiange) {
             << setw(12) << point.avg
             << endl;
         datachange::changecalsetting("v1", point.voltage);
-        return point.voltage;
+        bestV = point.voltage;
     }
 
-    // 增加默认返回值，防止无结果时函数无返回
-    return V;
+    return bestV;
 }
 
 double BEST::bestfre()

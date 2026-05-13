@@ -2,16 +2,18 @@
 #include <iostream>
 #pragma once
 
-static double com_fmin = 0.5; // 色散结构最小频率
+static double com_fmin = 1; // 色散结构最小频率
 static double hf = 0.5; // 频率步进
+static double sweep_point = 8;// 扫频点数
 //-------------------------目标初始需求--------------------------
-static double minfre = 2;
-static double maxfre = 4;
+static double minfre = 12;
+static double maxfre = 14;
 static double V = 10000;
-static double Pout = 500;
-static double Gain = 46;
+static double Pout = 400;
+static double Gain = 30;
 static double mostpin = Pout / pow(10, Gain / 10); // 达到目标的最大输入功率
 extern double guanzi_type;
+extern double bestV;
 //-------------------------最佳电压扫描参数-----------------------
 static double Vjiange = 10;    // 电压扫描时的采样间隔数
 static double Vcha = 100;      // 目标电压允许的半偏差范围
